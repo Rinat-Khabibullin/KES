@@ -683,10 +683,12 @@ summary:focus-visible {
 
 .hero-ribbon {
   display: flex;
+  width: min(100% - 40px, var(--container));
+  justify-content: center;
   gap: 10px;
-  width: max-content;
-  margin-top: 48px;
-  animation: ribbon-slide 22s linear infinite;
+  margin: 48px auto 0;
+  overflow: hidden;
+  animation: ribbon-slide 9s ease-in-out infinite;
 }
 
 .hero-ribbon span {
@@ -1663,12 +1665,13 @@ details p {
 }
 
 @keyframes ribbon-slide {
-  from {
-    transform: translateX(-20px);
+  0%,
+  100% {
+    transform: translateX(0);
   }
 
-  to {
-    transform: translateX(-360px);
+  50% {
+    transform: translateX(-18px);
   }
 }
 
