@@ -24,7 +24,7 @@ function Prices() {
             <PhoneCall size={17} />
             Позвонить нам
           </a>
-          <a className="button button--quiet button--small" href="#works">
+          <a className="button button--quiet button--small" href="#photo-estimate">
             <Camera size={17} />
             Оценить по фото
           </a>

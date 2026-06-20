@@ -5,10 +5,11 @@ import BrandMark from "../BrandMark/BrandMark";
 const navItems = [
   { href: "#services", label: "Услуги" },
   { href: "#works", label: "Работы" },
+  { href: "#photo-estimate", label: "Фото" },
   { href: "#prices", label: "Цены" },
-  { href: "#process", label: "Как работаем" },
+  { href: "#process", label: "Процесс" },
   { href: "#partners", label: "Партнерам" },
-  { href: "#areas", label: "География" },
+  { href: "#areas", label: "Район" },
   { href: "#contacts", label: "Контакты" },
 ];
 
@@ -34,7 +35,7 @@ function Header() {
         </nav>
         <a className="button button--small button--primary" href={phoneHref}>
           <PhoneCall size={17} />
-          Консультация бесплатно
+          Позвонить
         </a>
       </div>
     </header>

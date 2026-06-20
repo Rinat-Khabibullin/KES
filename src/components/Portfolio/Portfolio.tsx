@@ -21,10 +21,21 @@ function Portfolio({ items, onOpen }: PortfolioProps) {
           {items.map((item) => (
             <article className="portfolio-card" key={item.id}>
               <button type="button" className="portfolio-card__button" onClick={() => onOpen(item)}>
-                <img src={item.src} alt={item.alt} loading="lazy" />
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  loading="lazy"
+                  decoding="async"
+                  width={item.width}
+                  height={item.height}
+                />
                 <span>Открыть фото</span>
               </button>
               <div className="portfolio-card__body">
+                <div className="portfolio-card__meta">
+                  <span>{item.object}</span>
+                  <span>{item.result}</span>
+                </div>
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>
               </div>

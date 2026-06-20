@@ -20,6 +20,12 @@ const badges = [
   { icon: BadgeCheck, text: "10+ лет практики" },
 ];
 
+const quickTrust = [
+  "подскажем, опасно ли включать линию",
+  "оценим фото щита или места монтажа",
+  "согласуем материалы до закупки",
+];
+
 function Hero() {
   return (
     <section className="hero section" id="top" aria-labelledby="hero-title">
@@ -35,10 +41,10 @@ function Hero() {
             Бесплатная консультация по телефону и фото
           </p>
           <h1 id="hero-title">
-            Электрик в Туапсе: щиты, проводка, свет и ремонт без хаоса
+            Электрик в Туапсе: щиты, проводка, свет и ремонт с бесплатной консультацией
           </h1>
           <p className="hero__lead">
-            Команда Михаила делает электромонтаж в квартирах, домах, офисах, кафе, автомойках и на
+            Команда электриков делает электромонтаж в квартирах, домах, офисах, кафе, автомойках и на
             открытых территориях. Поможем разобраться в задаче, оценим по фото, согласуем материалы
             и аккуратно доведем работу до проверки.
           </p>
@@ -51,10 +57,18 @@ function Hero() {
               <ArrowUpRight size={19} />
               Профиль на Авито
             </a>
-            <a className="button button--quiet" href="#works">
+            <a className="button button--quiet" href="#photo-estimate">
               <Camera size={19} />
               Оценить по фото
             </a>
+          </div>
+          <div className="hero__assist">
+            <strong>Если задача непонятна — это нормально.</strong>
+            <ul>
+              {quickTrust.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
           </div>
           <ul className="badge-list" aria-label="Ключевые преимущества">
             {badges.map((badge) => (
@@ -70,6 +84,10 @@ function Hero() {
             <img
               src={publicAsset("works/work-06.jpg")}
               alt="Собранный электрощит с автоматикой и реле напряжения"
+              width="360"
+              height="480"
+              decoding="async"
+              fetchPriority="high"
             />
             <div className="hero-showcase__label">
               <Zap size={18} />
@@ -87,8 +105,22 @@ function Hero() {
             </div>
           </div>
           <div className="hero-showcase__photos">
-            <img src={publicAsset("works/work-07.jpg")} alt="Монтаж освещения на открытой территории" />
-            <img src={publicAsset("works/work-08.jpg")} alt="LED-подсветка мебели и рабочих зон" />
+            <img
+              src={publicAsset("works/work-07.jpg")}
+              alt="Монтаж освещения на открытой территории"
+              width="640"
+              height="288"
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              src={publicAsset("works/work-08.jpg")}
+              alt="LED-подсветка мебели и рабочих зон"
+              width="360"
+              height="480"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         </aside>
       </div>

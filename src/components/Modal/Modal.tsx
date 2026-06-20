@@ -38,8 +38,12 @@ function Modal({ item, onClose }: ModalProps) {
         <button className="modal__close" type="button" onClick={onClose} aria-label="Закрыть фото">
           ×
         </button>
-        <img src={item.src} alt={item.alt} />
+        <img src={item.src} alt={item.alt} width={item.width} height={item.height} decoding="async" />
         <div className="modal__text">
+          <div className="modal__meta">
+            <span>{item.object}</span>
+            <span>{item.result}</span>
+          </div>
           <h2 id="modal-title">{item.title}</h2>
           <p>{item.description}</p>
         </div>

@@ -27,9 +27,9 @@ function Contact() {
             <ArrowUpRight size={19} />
             Открыть Авито
           </a>
-          <a className="button button--quiet" href="#works">
+          <a className="button button--quiet" href="#photo-estimate">
             <Camera size={19} />
-            Смотреть примеры работ
+            Оценить по фото
           </a>
         </div>
       </div>
