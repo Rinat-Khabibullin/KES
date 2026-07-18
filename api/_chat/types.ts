@@ -23,6 +23,10 @@ export type ApiErrorBody = {
     | "message_too_long"
     | "rate_limited"
     | "service_unavailable"
+    | "invalid_credentials"
+    | "upstream_timeout"
+    | "tls_error"
+    | "internal_error"
     | "upstream_error";
 };
 
