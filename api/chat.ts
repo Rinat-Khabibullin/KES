@@ -1,7 +1,7 @@
-import { askGigaChat } from "./_chat/gigachatClient";
-import { guardMessage, normalizeMessage, sanitizeHistory } from "./_chat/guards";
-import { buildModelMessages, chatModelConfig } from "./_chat/prompt";
-import type { ApiErrorBody, ChatRequestBody, ChatResponseBody } from "./_chat/types";
+import { askGigaChat } from "./_chat/gigachatClient.js";
+import { guardMessage, normalizeMessage, sanitizeHistory } from "./_chat/guards.js";
+import { buildModelMessages, chatModelConfig } from "./_chat/prompt.js";
+import type { ApiErrorBody, ChatRequestBody, ChatResponseBody } from "./_chat/types.js";
 
 export const maxDuration = 30;
 

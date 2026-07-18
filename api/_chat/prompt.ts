@@ -1,5 +1,5 @@
-import { siteContext } from "./siteContext";
-import type { ClientChatMessage, ModelMessage } from "./types";
+import { siteContext } from "./siteContext.js";
+import type { ClientChatMessage, ModelMessage } from "./types.js";
 
 const list = (items: string[]) => items.map((item) => `- ${item}`).join("\n");
 

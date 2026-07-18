@@ -1,5 +1,5 @@
-import { chatModelConfig } from "./prompt";
-import type { ChatGuardResult, ClientChatMessage } from "./types";
+import { chatModelConfig } from "./prompt.js";
+import type { ChatGuardResult, ClientChatMessage } from "./types.js";
 
 const offTopicKeywords = [
   "биткоин",

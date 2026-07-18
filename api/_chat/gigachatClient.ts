@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import https from "node:https";
-import { chatModelConfig } from "./prompt";
-import type { ModelMessage } from "./types";
+import { chatModelConfig } from "./prompt.js";
+import type { ModelMessage } from "./types.js";
 
 type OAuthResponse = {
   access_token?: string;

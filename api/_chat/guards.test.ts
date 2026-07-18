@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { guardMessage, normalizeMessage, sanitizeHistory } from "./guards";
+import { guardMessage, normalizeMessage, sanitizeHistory } from "./guards.js";
 
 describe("chat guards", () => {
   it("detects dangerous electrical situations", () => {
