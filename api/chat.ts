@@ -1,15 +1,9 @@
-import type { IncomingHttpHeaders, IncomingMessage, ServerResponse } from "node:http";
 import { askGigaChat } from "./_chat/gigachatClient";
 import { guardMessage, normalizeMessage, sanitizeHistory } from "./_chat/guards";
 import { buildModelMessages, chatModelConfig } from "./_chat/prompt";
 import type { ApiErrorBody, ChatRequestBody, ChatResponseBody } from "./_chat/types";
 
 export const maxDuration = 30;
-
-type ApiRequest = IncomingMessage & {
-  body?: unknown;
-  headers: IncomingHttpHeaders;
-};
 
 const rateLimitBucket = new Map<string, number[]>();
 
@@ -18,34 +12,43 @@ const jsonHeaders = {
   "Cache-Control": "no-store",
 };
 
-const getIp = (request: ApiRequest) => {
-  const forwarded = request.headers["x-forwarded-for"];
-  if (typeof forwarded === "string" && forwarded.length > 0) {
+const getIp = (request: Request) => {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
     return forwarded.split(",")[0]?.trim() || "unknown";
   }
 
-  return request.socket.remoteAddress || "unknown";
+  return request.headers.get("x-real-ip") || "unknown";
 };
 
-const setCors = (request: ApiRequest, response: ServerResponse) => {
+const createHeaders = (request: Request) => {
+  const headers = new Headers(jsonHeaders);
   const allowedOrigin = process.env.LLM_CORS_ORIGIN?.trim();
-  const origin = request.headers.origin;
+  const origin = request.headers.get("origin");
 
   if (allowedOrigin && origin === allowedOrigin) {
-    response.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-    response.setHeader("Vary", "Origin");
+    headers.set("Access-Control-Allow-Origin", allowedOrigin);
+    headers.set("Vary", "Origin");
   }
 
-  response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+  return headers;
 };
 
-const sendJson = (response: ServerResponse, statusCode: number, body: ChatResponseBody | ApiErrorBody) => {
-  response.writeHead(statusCode, jsonHeaders);
-  response.end(JSON.stringify(body));
-};
+const sendJson = (
+  request: Request,
+  statusCode: number,
+  body: ChatResponseBody | ApiErrorBody,
+) =>
+  new Response(JSON.stringify(body), {
+    status: statusCode,
+    headers: createHeaders(request),
+  });
 
-const getSafeErrorMessage = (error: unknown) => (error instanceof Error ? error.message : "Unknown chat error");
+const getSafeErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "Unknown chat error";
 
 const classifyChatError = (
   error: unknown,
@@ -72,7 +75,7 @@ const classifyChatError = (
     return {
       code: "upstream_timeout",
       userMessage:
-        "GigaChat слишком долго отвечает. Попробуйте еще раз или позвоните нам — консультация бесплатная.",
+        "GigaChat слишком долго отвечает. Попробуйте еще раз или позвоните нам - консультация бесплатная.",
     };
   }
 
@@ -87,7 +90,7 @@ const classifyChatError = (
   return {
     code: "upstream_error",
     userMessage:
-      "Сейчас не получилось получить ответ от помощника. Можно позвонить нам или открыть Авито — консультация бесплатная.",
+      "Сейчас не получилось получить ответ от помощника. Можно позвонить нам или открыть Авито - консультация бесплатная.",
   };
 };
 
@@ -95,26 +98,13 @@ const logChatError = (stage: string, error: unknown) => {
   console.error("[chat-api]", stage, getSafeErrorMessage(error).slice(0, 300));
 };
 
-const readJsonBody = async (request: ApiRequest): Promise<unknown> => {
-  if (request.body) {
-    return request.body;
+const readJsonBody = async (request: Request): Promise<unknown> => {
+  const rawBody = await request.text();
+
+  if (Buffer.byteLength(rawBody, "utf8") > 32_000) {
+    throw new Error("Request body is too large");
   }
 
-  const chunks: Buffer[] = [];
-  let size = 0;
-
-  for await (const chunk of request) {
-    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-    size += buffer.length;
-
-    if (size > 32_000) {
-      throw new Error("Request body is too large");
-    }
-
-    chunks.push(buffer);
-  }
-
-  const rawBody = Buffer.concat(chunks).toString("utf8");
   return rawBody ? JSON.parse(rawBody) : {};
 };
 
@@ -133,30 +123,27 @@ const checkRateLimit = (ip: string) => {
   return true;
 };
 
-export default async function handler(request: ApiRequest, response: ServerResponse) {
+export const handleChatRequest = async (request: Request) => {
   try {
-    setCors(request, response);
-
     if (request.method === "OPTIONS") {
-      response.writeHead(204);
-      response.end();
-      return;
+      return new Response(null, {
+        status: 204,
+        headers: createHeaders(request),
+      });
     }
 
     if (request.method !== "POST") {
-      sendJson(response, 405, {
+      return sendJson(request, 405, {
         error: "Метод не поддерживается.",
         code: "method_not_allowed",
       });
-      return;
     }
 
     if (!checkRateLimit(getIp(request))) {
-      sendJson(response, 429, {
+      return sendJson(request, 429, {
         error: "Слишком много сообщений подряд. Подождите минуту и попробуйте снова.",
         code: "rate_limited",
       });
-      return;
     }
 
     let body: ChatRequestBody;
@@ -164,49 +151,45 @@ export default async function handler(request: ApiRequest, response: ServerRespo
     try {
       body = (await readJsonBody(request)) as ChatRequestBody;
     } catch {
-      sendJson(response, 400, {
+      return sendJson(request, 400, {
         error: "Не удалось прочитать сообщение.",
         code: "bad_request",
       });
-      return;
     }
 
     const message = normalizeMessage(body.message);
 
     if (!message) {
-      sendJson(response, 400, {
+      return sendJson(request, 400, {
         error: "Напишите вопрос по электрике.",
         code: "bad_request",
       });
-      return;
     }
 
     if (message.length > chatModelConfig.maxInputLength) {
-      sendJson(response, 413, {
+      return sendJson(request, 413, {
         error: `Сообщение слишком длинное. Сократите его до ${chatModelConfig.maxInputLength} символов.`,
         code: "message_too_long",
       });
-      return;
     }
 
     const guard = guardMessage(message);
     if (!guard.allowed) {
-      sendJson(response, 200, {
+      return sendJson(request, 200, {
         reply: guard.reply,
         source: "local",
       });
-      return;
     }
 
     try {
       const history = sanitizeHistory(body.history);
       const reply = await askGigaChat(buildModelMessages(message, history));
-      sendJson(response, 200, { reply, source: "gigachat" });
+      return sendJson(request, 200, { reply, source: "gigachat" });
     } catch (error) {
       const details = classifyChatError(error);
       logChatError(details.code, error);
 
-      sendJson(response, 503, {
+      return sendJson(request, 503, {
         error: details.userMessage,
         code: details.code,
       });
@@ -214,14 +197,17 @@ export default async function handler(request: ApiRequest, response: ServerRespo
   } catch (error) {
     logChatError("internal_error", error);
 
-    if (!response.headersSent) {
-      sendJson(response, 500, {
-        error: "Внутренняя ошибка чата. Мы уже можем принять заявку по телефону или через Авито.",
-        code: "internal_error",
-      });
-      return;
-    }
-
-    response.end();
+    return sendJson(request, 500, {
+      error: "Внутренняя ошибка чата. Мы уже можем принять заявку по телефону или через Авито.",
+      code: "internal_error",
+    });
   }
-}
+};
+
+export const GET = handleChatRequest;
+export const POST = handleChatRequest;
+export const OPTIONS = handleChatRequest;
+
+export default {
+  fetch: handleChatRequest,
+};

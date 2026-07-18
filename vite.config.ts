@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import chatHandler from "./api/chat";
+import { Readable } from "node:stream";
+import chatApi from "./api/chat";
 
 const loadServerEnv = (mode: string) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -24,7 +25,28 @@ const localApiRoutes = (): Plugin => ({
       }
 
       try {
-        await chatHandler(request, response);
+        const method = request.method || "GET";
+        const headers = new Headers();
+
+        for (const [key, value] of Object.entries(request.headers)) {
+          if (Array.isArray(value)) {
+            value.forEach((item) => headers.append(key, item));
+          } else if (value) {
+            headers.set(key, value);
+          }
+        }
+
+        const webRequest = new Request(`http://localhost${request.url || "/api/chat"}`, {
+          method,
+          headers,
+          body: method === "GET" || method === "HEAD" ? undefined : Readable.toWeb(request),
+          duplex: "half",
+        } as RequestInit & { duplex: "half" });
+        const webResponse = await chatApi.fetch(webRequest);
+
+        response.statusCode = webResponse.status;
+        webResponse.headers.forEach((value, key) => response.setHeader(key, value));
+        response.end(Buffer.from(await webResponse.arrayBuffer()));
       } catch (error) {
         server.ssrFixStacktrace(error as Error);
         next(error);
