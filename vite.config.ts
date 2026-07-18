@@ -1,7 +1,21 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { Readable } from "node:stream";
+import calculateEstimateApi from "./api/estimate/calculate";
 import chatApi from "./api/chat";
+import pricesApi from "./api/prices";
+import priceSearchApi from "./api/prices/search";
+
+type LocalApiHandler = {
+  fetch: (request: Request) => Promise<Response> | Response;
+};
+
+const apiRoutes = new Map<string, LocalApiHandler>([
+  ["/api/chat", chatApi],
+  ["/api/prices", pricesApi],
+  ["/api/prices/search", priceSearchApi],
+  ["/api/estimate/calculate", calculateEstimateApi],
+]);
 
 const loadServerEnv = (mode: string) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -19,7 +33,9 @@ const localApiRoutes = (): Plugin => ({
     server.middlewares.use(async (request, response, next) => {
       const pathname = request.url ? new URL(request.url, "http://localhost").pathname : "";
 
-      if (pathname !== "/api/chat") {
+      const apiRoute = apiRoutes.get(pathname);
+
+      if (!apiRoute) {
         next();
         return;
       }
@@ -42,7 +58,7 @@ const localApiRoutes = (): Plugin => ({
           body: method === "GET" || method === "HEAD" ? undefined : Readable.toWeb(request),
           duplex: "half",
         } as RequestInit & { duplex: "half" });
-        const webResponse = await chatApi.fetch(webRequest);
+        const webResponse = await apiRoute.fetch(webRequest);
 
         response.statusCode = webResponse.status;
         webResponse.headers.forEach((value, key) => response.setHeader(key, value));

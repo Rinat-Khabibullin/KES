@@ -1,6 +1,7 @@
 import { Camera, PhoneCall, Sparkles } from "lucide-react";
 import { priceGroups } from "../../data/prices";
 import { phoneHref } from "../../data/site";
+import EstimateCalculator from "../EstimateCalculator/EstimateCalculator";
 
 function Prices() {
   return (
@@ -28,6 +29,15 @@ function Prices() {
             <Camera size={17} />
             Оценить по фото
           </a>
+        </div>
+        <EstimateCalculator />
+        <div className="section-heading section-heading--wide price-heading-secondary">
+          <p className="eyebrow">Ориентиры</p>
+          <h3>Частые позиции из прайса</h3>
+          <p>
+            Ниже короткий список для быстрого понимания. Полный каталог, расчет по метражу и
+            предупреждения по составу работ доступны в калькуляторе выше.
+          </p>
         </div>
         <div className="price-grid">
           {priceGroups.map((group) => (

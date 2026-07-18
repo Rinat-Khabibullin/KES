@@ -1,8 +1,9 @@
-import type { ChatApiMessage, ChatApiResponse } from "../types/chat";
+import type { ChatApiMessage, ChatApiResponse, ChatEstimateContext } from "../types/chat";
 
 type SendChatMessageParams = {
   message: string;
   history: ChatApiMessage[];
+  estimateContext?: ChatEstimateContext;
   signal?: AbortSignal;
 };
 
@@ -13,13 +14,13 @@ export class ChatClientError extends Error {
   }
 }
 
-export const sendChatMessage = async ({ message, history, signal }: SendChatMessageParams) => {
+export const sendChatMessage = async ({ message, history, estimateContext, signal }: SendChatMessageParams) => {
   const response = await fetch("/api/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ message, history }),
+    body: JSON.stringify({ message, history, estimateContext }),
     signal,
   });
 

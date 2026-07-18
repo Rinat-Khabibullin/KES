@@ -1,3 +1,5 @@
+import type { EstimateConditions, EstimateLineInput, EstimateResult } from "../shared/estimate/types";
+
 export type ChatRole = "user" | "assistant";
 
 export type ChatMessage = {
@@ -11,6 +13,13 @@ export type ChatMessage = {
 export type ChatApiMessage = {
   role: ChatRole;
   content: string;
+};
+
+export type ChatEstimateContext = {
+  catalogVersion: string;
+  lines: EstimateLineInput[];
+  conditions?: EstimateConditions;
+  calculatedResult?: EstimateResult;
 };
 
 export type ChatApiResponse = {

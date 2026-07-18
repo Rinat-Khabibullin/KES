@@ -1,3 +1,5 @@
+import type { EstimateConditions, EstimateLineInput, EstimateResult } from "../../src/shared/estimate/types.js";
+
 export type ChatRole = "user" | "assistant";
 
 export type ClientChatMessage = {
@@ -8,6 +10,12 @@ export type ClientChatMessage = {
 export type ChatRequestBody = {
   message: string;
   history?: ClientChatMessage[];
+  estimateContext?: {
+    catalogVersion: string;
+    lines: EstimateLineInput[];
+    conditions?: EstimateConditions;
+    calculatedResult?: EstimateResult;
+  };
 };
 
 export type ChatResponseBody = {

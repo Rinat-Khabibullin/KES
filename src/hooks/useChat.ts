@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { chatGreeting, chatInputLimit } from "../data/chat";
 import { ChatClientError, sendChatMessage } from "../api/chatClient";
-import type { ChatApiMessage, ChatMessage } from "../types/chat";
+import type { ChatApiMessage, ChatEstimateContext, ChatMessage } from "../types/chat";
 
 const storageKey = "elektrika-tuapse-chat-history";
 const requestTimeoutMs = 35_000;
@@ -72,7 +72,7 @@ export const useChat = () => {
   }, []);
 
   const send = useCallback(
-    async (rawMessage?: string) => {
+    async (rawMessage?: string, estimateContext?: ChatEstimateContext) => {
       const message = (rawMessage ?? draft).trim();
 
       if (!message || sendingRef.current) {
@@ -104,6 +104,7 @@ export const useChat = () => {
         const response = await sendChatMessage({
           message,
           history: compactHistory,
+          estimateContext,
           signal: controller.signal,
         });
         setMessages((current) => [...current, createMessage("assistant", response.reply, response.source)]);
@@ -124,6 +125,21 @@ export const useChat = () => {
     },
     [compactHistory, draft],
   );
+
+  useEffect(() => {
+    const handleEstimateChat = (event: Event) => {
+      const customEvent = event as CustomEvent<{
+        message?: string;
+        estimateContext?: ChatEstimateContext;
+      }>;
+
+      setIsOpen(true);
+      void send(customEvent.detail?.message, customEvent.detail?.estimateContext);
+    };
+
+    window.addEventListener("estimate-chat:send", handleEstimateChat);
+    return () => window.removeEventListener("estimate-chat:send", handleEstimateChat);
+  }, [send]);
 
   return {
     clearMessages,

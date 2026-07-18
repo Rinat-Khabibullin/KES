@@ -1,5 +1,6 @@
 import { askGigaChat } from "./_chat/gigachatClient.js";
 import { guardMessage, normalizeMessage, sanitizeHistory } from "./_chat/guards.js";
+import { buildPricingContext } from "./_chat/priceContext.js";
 import { buildModelMessages, chatModelConfig } from "./_chat/prompt.js";
 import type { ApiErrorBody, ChatRequestBody, ChatResponseBody } from "./_chat/types.js";
 
@@ -183,11 +184,20 @@ export const handleChatRequest = async (request: Request) => {
 
     try {
       const history = sanitizeHistory(body.history);
-      const reply = await askGigaChat(buildModelMessages(message, history));
+      const pricingContext = buildPricingContext(message, body.estimateContext);
+      const reply = await askGigaChat(buildModelMessages(message, history, pricingContext?.prompt));
       return sendJson(request, 200, { reply, source: "gigachat" });
     } catch (error) {
       const details = classifyChatError(error);
       logChatError(details.code, error);
+
+      const pricingContext = buildPricingContext(message, body.estimateContext);
+      if (pricingContext?.localFallbackReply) {
+        return sendJson(request, 200, {
+          reply: pricingContext.localFallbackReply,
+          source: "local",
+        });
+      }
 
       return sendJson(request, 503, {
         error: details.userMessage,
