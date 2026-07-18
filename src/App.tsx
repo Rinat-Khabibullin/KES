@@ -17,6 +17,7 @@ import Footer from "./components/Footer/Footer";
 import Modal from "./components/Modal/Modal";
 import { avitoUrl, phoneHref } from "./data/site";
 import Partners from "./components/Partners/Partners";
+import ChatWidget from "./components/ChatWidget/ChatWidget";
 
 function App() {
   const [activeWork, setActiveWork] = useState<PortfolioItem | null>(null);
@@ -115,6 +116,7 @@ function App() {
       </main>
       <Footer />
       <Modal item={activeWork} onClose={() => setActiveWork(null)} />
+      <ChatWidget />
       <div className="mobile-cta" aria-label="Быстрые контакты">
         <a href={phoneHref} className="mobile-cta__button mobile-cta__button--primary">
           Позвонить нам
