@@ -10,17 +10,37 @@ const offTopicKeywords = [
   "выбор",
   "реферат",
   "диплом",
+  "сочинение",
   "код на python",
   "react",
   "javascript",
   "typescript",
   "sql",
+  "лендинг",
+  "разработк",
+  "программ",
+  "верстк",
+  "веб",
+  "seo",
   "врач",
   "лекарств",
   "диагноз",
+  "рецепт",
+  "плов",
+  "борщ",
+  "ужин",
+  "обед",
+  "еда",
+  "готов",
+  "спорт",
+  "футбол",
+  "погода",
+  "новост",
+  "переведи",
+  "английск",
 ];
 
-const onTopicKeywords = [
+const serviceKeywords = [
   "элект",
   "розет",
   "провод",
@@ -40,24 +60,177 @@ const onTopicKeywords = [
   "духов",
   "кондиционер",
   "автомой",
-  "ремонт",
+  "авто мой",
+  "мойк",
+  "кафе",
+  "общепит",
+  "офис",
+  "квартира",
+  "дом",
+  "коттедж",
+  "гостиниц",
+  "отель",
+  "магазин",
+  "витрин",
+  "помещен",
+  "объект",
+  "коммерц",
+  "неисправ",
+  "замык",
+  "искр",
+  "выбивает",
+  "пропал свет",
+  "нет света",
+  "пахнет",
+  "авар",
+  "диагност",
+  "монтаж",
+  "демонтаж",
+  "перенос",
+  "установка",
+  "замена",
+  "подключ",
+  "проклад",
+  "штроб",
+  "гофр",
+  "трасс",
+  "линия",
+  "нагрузк",
+  "мощност",
+  "заземл",
+  "ноль",
+  "фаза",
+  "ввод",
+  "счетчик",
+  "счётчик",
+  "автоматик",
+  "защит",
+  "слаботоч",
+  "кабель канал",
+  "распред",
+  "коробк",
+  "клемм",
+  "светильник",
+  "трек",
+  "бра",
+  "спот",
+  "led",
+  "лед",
+  "лента",
+  "подсветк",
+  "фасад",
+  "улич",
+  "наруж",
+  "внутрен",
+  "теплый пол",
+  "теплого пола",
+  "тёплый пол",
+  "тёплого пола",
+];
+
+const businessKeywords = [
   "выезд",
+  "вызов",
   "стоим",
   "цена",
+  "прайс",
   "сколько",
+  "смет",
+  "расчет",
+  "расчёт",
+  "оцен",
+  "бесплатн",
+  "консультац",
+  "минимальн",
+  "заказ",
   "договор",
   "гарант",
+  "оплат",
+  "предоплат",
+  "акт",
+  "материал",
+  "закуп",
+  "срок",
+  "когда",
+  "сегодня",
+  "завтра",
+  "сроч",
+  "вечер",
+  "выходн",
+  "ежеднев",
+  "мастер",
+  "бригада",
+  "команда",
+  "специалист",
+  "телефон",
+  "номер",
+  "контакт",
+  "позвон",
+  "звон",
+  "связ",
   "фото",
+  "фотограф",
+  "снимок",
+  "картинк",
+  "прислать",
+  "отправ",
   "авито",
+];
+
+const areaKeywords = [
   "туапсе",
   "агой",
   "небуг",
   "ольгинка",
   "новомихайловский",
+  "джубга",
+  "лермонтово",
+  "псебе",
+  "шепси",
+  "сочи",
+  "краснодарский край",
+  "район",
+  "посел",
+  "посёл",
+  "село",
+  "адрес",
+  "объект",
+  "выезд",
+];
+
+const partnerKeywords = [
   "плиточ",
   "потолоч",
   "сантех",
   "отделоч",
+  "ремонтник",
+  "прораб",
+  "дизайнер",
+  "строител",
+  "мебельщик",
+  "оконщик",
+  "двер",
+  "кровельщик",
+  "маляр",
+  "штукатур",
+  "реклам",
+  "партнер",
+  "партнёр",
+  "сотруднич",
+  "заявк",
+  "лид",
+  "рекомендац",
+  "рекоменду",
+  "заказчик",
+  "клиент",
+  "обмен",
+];
+
+const onTopicKeywords = [
+  ...serviceKeywords,
+  ...businessKeywords,
+  ...areaKeywords,
+  ...partnerKeywords,
 ];
 
 const dangerKeywords = [
@@ -119,9 +292,9 @@ export const sanitizeHistory = (history: unknown): ClientChatMessage[] => {
 };
 
 export const guardMessage = (message: string): ChatGuardResult => {
-  const normalized = message.toLowerCase();
+  const normalized = message.toLowerCase().replace(/ё/g, "е");
 
-  if (dangerKeywords.some((keyword) => normalized.includes(keyword))) {
+  if (dangerKeywords.some((keyword) => normalized.includes(keyword.replace(/ё/g, "е")))) {
     return {
       allowed: false,
       reason: "danger",
@@ -130,7 +303,7 @@ export const guardMessage = (message: string): ChatGuardResult => {
     };
   }
 
-  if (diyDangerPatterns.some((keyword) => normalized.includes(keyword))) {
+  if (diyDangerPatterns.some((keyword) => normalized.includes(keyword.replace(/ё/g, "е")))) {
     return {
       allowed: false,
       reason: "danger",
@@ -139,15 +312,15 @@ export const guardMessage = (message: string): ChatGuardResult => {
     };
   }
 
-  const hasOnTopic = onTopicKeywords.some((keyword) => normalized.includes(keyword));
-  const hasOffTopic = offTopicKeywords.some((keyword) => normalized.includes(keyword));
+  const hasOnTopic = onTopicKeywords.some((keyword) => normalized.includes(keyword.replace(/ё/g, "е")));
+  const hasOffTopic = offTopicKeywords.some((keyword) => normalized.includes(keyword.replace(/ё/g, "е")));
 
-  if (hasOffTopic && !hasOnTopic) {
+  if (!hasOnTopic || hasOffTopic) {
     return {
       allowed: false,
       reason: "off_topic",
       reply:
-        "Я отвечаю только по электромонтажу и услугам электрика в Туапсе и районе: щиты, проводка, розетки, освещение, теплый пол, аварийный ремонт, цены и выезд. Можете описать задачу по электрике своими словами.",
+        "Я отвечаю только по электромонтажу и услугам электрика в Туапсе и районе: щиты, проводка, розетки, освещение, теплый пол, аварийный ремонт, цены, выезд, оценка по фото и сотрудничество с ремонтными специалистами. Опишите задачу по электрике или напишите, с кем хотите обсудить партнерство.",
     };
   }
 

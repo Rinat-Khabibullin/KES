@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:vercel": "vercel dev",
+    "dev:vercel": "vite",
     "check": "tsc -b",
     "test": "vitest run",
     "build": "tsc -b && vite build",

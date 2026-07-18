@@ -8,21 +8,12 @@
 
 ## Запуск локально
 
-Только frontend без serverless API:
-
 ```bash
 npm install
 npm run dev
 ```
 
-Frontend вместе с `/api/chat` через Vercel Functions:
-
-```bash
-npm install
-npm install -g vercel
-cp .env.example .env.local
-vercel dev
-```
+В dev-режиме Vite сам обслуживает `/api/chat`, поэтому Vercel CLI и авторизация в Vercel для локального запуска не нужны.
 
 ## Переменные окружения
 
