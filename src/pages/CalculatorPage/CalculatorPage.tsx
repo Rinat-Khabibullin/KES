@@ -39,8 +39,6 @@ function CalculatorPage() {
             </div>
           </div>
 
-          <EstimateCalculator />
-
           <div className="calculator-page__note">
             <strong>Важно перед заказом</strong>
             <p>
@@ -49,6 +47,8 @@ function CalculatorPage() {
               Черновик сметы сохраняется в браузере и не пропадет при переходе на главную страницу.
             </p>
           </div>
+
+          <EstimateCalculator />
         </div>
       </section>
     </main>

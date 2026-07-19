@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 const focusTarget = (target: HTMLElement) => {
@@ -24,13 +24,49 @@ const focusTarget = (target: HTMLElement) => {
   }
 };
 
+const scrollToTopInstantly = () => {
+  const root = document.documentElement;
+  const body = document.body;
+  const previousRootScrollBehavior = root.style.scrollBehavior;
+  const previousBodyScrollBehavior = body.style.scrollBehavior;
+
+  root.style.scrollBehavior = "auto";
+  body.style.scrollBehavior = "auto";
+  window.scrollTo(0, 0);
+
+  window.requestAnimationFrame(() => {
+    window.scrollTo(0, 0);
+    root.style.scrollBehavior = previousRootScrollBehavior;
+    body.style.scrollBehavior = previousBodyScrollBehavior;
+  });
+};
+
 function ScrollToHash() {
   const location = useLocation();
+  const previousPathnameRef = useRef(location.pathname);
+
+  useLayoutEffect(() => {
+    const previousPathname = previousPathnameRef.current;
+    previousPathnameRef.current = location.pathname;
+
+    if (location.hash || previousPathname === location.pathname) {
+      return;
+    }
+
+    scrollToTopInstantly();
+
+    const main = document.getElementById("main-content");
+    if (main) {
+      focusTarget(main);
+    }
+  }, [location.hash, location.pathname]);
 
   useEffect(() => {
     if (!location.hash) {
       return;
     }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const id = decodeURIComponent(location.hash.slice(1));
     const target = document.getElementById(id);
@@ -38,8 +74,6 @@ function ScrollToHash() {
     if (!target) {
       return;
     }
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     window.requestAnimationFrame(() => {
       target.scrollIntoView({

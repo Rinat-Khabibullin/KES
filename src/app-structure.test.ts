@@ -30,8 +30,20 @@ describe("app structure", () => {
 
     expect(appSource).toContain("<ScrollToHash />");
     expect(scrollSource).toContain("scrollIntoView");
+    expect(scrollSource).toContain("window.scrollTo");
+    expect(scrollSource).toContain('document.getElementById("main-content")');
     expect(scrollSource).toContain("prefers-reduced-motion");
     expect(scrollSource).toContain('tabindex", "-1"');
+  });
+
+  it("shows the calculator notice before the estimate calculator", () => {
+    const calculatorPageSource = readSource("./pages/CalculatorPage/CalculatorPage.tsx");
+    const noteIndex = calculatorPageSource.indexOf('className="calculator-page__note"');
+    const calculatorIndex = calculatorPageSource.indexOf("<EstimateCalculator />");
+
+    expect(noteIndex).toBeGreaterThan(-1);
+    expect(calculatorIndex).toBeGreaterThan(-1);
+    expect(noteIndex).toBeLessThan(calculatorIndex);
   });
 
   it("routes quick chat actions through the local responder before API sending", () => {
