@@ -1,4 +1,4 @@
-import type { EstimateUnit, ServicePrice } from "./types";
+import type { EstimateUnit, ServicePrice } from "./types.js";
 
 const moneyFormatter = new Intl.NumberFormat("ru-RU", {
   maximumFractionDigits: 0,

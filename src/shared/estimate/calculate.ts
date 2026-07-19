@@ -1,5 +1,5 @@
-import { estimateCatalogVersion, estimateServices, getServiceById, getServiceIdByLegacyNumber } from "./catalog";
-import { formatLineTotal, formatMoney, formatMoneyRange, formatPrice, unitPriceLabels } from "./format";
+import { estimateCatalogVersion, estimateServices, getServiceById, getServiceIdByLegacyNumber } from "./catalog.js";
+import { formatLineTotal, formatMoney, formatMoneyRange, formatPrice, unitPriceLabels } from "./format.js";
 import type {
   EstimateCalculateRequest,
   EstimateLineInput,
@@ -8,7 +8,7 @@ import type {
   EstimateService,
   EstimateWarning,
   PriceKind,
-} from "./types";
+} from "./types.js";
 
 export class EstimateCalculationError extends Error {
   code: "invalid_items" | "unknown_service" | "invalid_quantity";

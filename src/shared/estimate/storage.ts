@@ -1,4 +1,4 @@
-import type { EstimateCalculateRequest, EstimateLineInput } from "./types";
+import type { EstimateCalculateRequest, EstimateLineInput } from "./types.js";
 
 export const estimateDraftStorageKey = "elektrika-tuapse-estimate-draft-v1";
 

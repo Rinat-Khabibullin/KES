@@ -1,5 +1,5 @@
-import { formatQuantity, unitLabels } from "./format";
-import type { EstimateResult } from "./types";
+import { formatQuantity, unitLabels } from "./format.js";
+import type { EstimateResult } from "./types.js";
 
 export const summarizeEstimateForChat = (result: EstimateResult) => {
   if (result.lines.length === 0) {

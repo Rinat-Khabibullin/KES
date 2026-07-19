@@ -6,7 +6,7 @@ import type {
   ServicePrice,
   ServiceQuantityConfig,
   ServiceRelation,
-} from "./types";
+} from "./types.js";
 
 export const estimateCatalogVersion = "2026-07-19-price-114";
 

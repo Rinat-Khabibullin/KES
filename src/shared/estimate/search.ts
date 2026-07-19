@@ -1,5 +1,5 @@
-import { estimateCategories, estimateServices } from "./catalog";
-import type { EstimateService, PriceSearchResult } from "./types";
+import { estimateCategories, estimateServices } from "./catalog.js";
+import type { EstimateService, PriceSearchResult } from "./types.js";
 
 export const normalizeSearchText = (value: string) =>
   value
