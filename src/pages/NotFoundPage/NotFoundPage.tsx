@@ -4,7 +4,7 @@ import { phoneHref } from "../../data/site";
 
 function NotFoundPage() {
   return (
-    <main>
+    <main id="main-content">
       <section className="section not-found" aria-labelledby="not-found-title">
         <div className="container not-found__content">
           <p className="eyebrow">Страница не найдена</p>

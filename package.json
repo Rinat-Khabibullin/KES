@@ -9,7 +9,7 @@
     "check": "tsc -b",
     "test": "vitest run",
     "build": "tsc -b && vite build",
-    "build:vercel": "npx --yes vercel build",
+    "build:vercel": "npx --yes vercel build --yes",
     "preview": "vite preview"
   },
   "dependencies": {

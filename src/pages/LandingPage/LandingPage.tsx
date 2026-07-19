@@ -19,7 +19,7 @@ type LandingPageProps = {
 
 function LandingPage({ onOpenWork }: LandingPageProps) {
   return (
-    <main>
+    <main id="main-content">
       <Hero />
       <Benefits />
       <Services />

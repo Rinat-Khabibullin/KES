@@ -1,7 +1,6 @@
 import {
-  ArrowUpRight,
   BadgeCheck,
-  Camera,
+  Calculator,
   Clock,
   FileCheck2,
   PhoneCall,
@@ -10,7 +9,9 @@ import {
   UsersRound,
   Zap,
 } from "lucide-react";
-import { avitoUrl, phoneHref } from "../../data/site";
+import { Link } from "react-router-dom";
+import { phoneHref } from "../../data/site";
+import { loadCalculatorPage } from "../../routes/lazyRoutes";
 import { publicAsset } from "../../utils/assets";
 
 const badges = [
@@ -53,14 +54,16 @@ function Hero() {
               <PhoneCall size={19} />
               Получить бесплатную консультацию
             </a>
-            <a className="button button--ghost" href={avitoUrl} target="_blank" rel="noopener noreferrer">
-              <ArrowUpRight size={19} />
-              Профиль на Авито
-            </a>
-            <a className="button button--quiet" href="#photo-estimate">
-              <Camera size={19} />
-              Оценить по фото
-            </a>
+            <Link
+              className="button button--secondary"
+              to="/calculator"
+              onFocus={() => void loadCalculatorPage()}
+              onPointerEnter={() => void loadCalculatorPage()}
+              onPointerDown={() => void loadCalculatorPage()}
+            >
+              <Calculator size={19} />
+              Рассчитать смету
+            </Link>
           </div>
           <div className="hero__assist">
             <strong>Если задача непонятна — это нормально.</strong>

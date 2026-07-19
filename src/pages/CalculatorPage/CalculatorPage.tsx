@@ -5,7 +5,7 @@ import { phoneHref } from "../../data/site";
 
 function CalculatorPage() {
   return (
-    <main>
+    <main id="main-content">
       <section className="section calculator-page" aria-labelledby="calculator-page-title">
         <div className="container">
           <Link className="calculator-page__back" to="/#prices">

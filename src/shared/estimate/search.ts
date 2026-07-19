@@ -6,7 +6,7 @@ export const normalizeSearchText = (value: string) =>
     .toLowerCase()
     .replace(/ё/g, "е")
     .replace(/×/g, "x")
-    .replace(/[()«»/.,;:—–-]/g, " ")
+    .replace(/[()«»/.,;:!?—–-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 

@@ -1,7 +1,8 @@
-import { Bot, MessageCircle, PhoneCall, Send, Sparkles, Trash2, X } from "lucide-react";
+import { Bot, HelpCircle, MessageCircle, PhoneCall, RotateCcw, Send, Sparkles, Trash2, X } from "lucide-react";
 import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useEffect, useRef } from "react";
-import { chatInputLimit, chatQuickQuestions } from "../../data/chat";
+import { Link } from "react-router-dom";
+import { chatInputLimit, chatQuickActions } from "../../data/chat";
 import { phoneHref } from "../../data/site";
 import { useChat } from "../../hooks/useChat";
 
@@ -11,10 +12,15 @@ function ChatWidget() {
     draft,
     isOpen,
     isSending,
+    lastFailedRequest,
     messages,
+    quickActionsVisible,
+    retryLastFailed,
     send,
+    sendQuickAction,
     setDraft,
     setIsOpen,
+    setQuickActionsVisible,
   } = useChat();
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -104,6 +110,13 @@ function ChatWidget() {
             </div>
           </div>
           <div className="chat-panel__tools">
+            <button
+              type="button"
+              onClick={() => setQuickActionsVisible((current) => !current)}
+              aria-label={quickActionsVisible ? "Скрыть подсказки" : "Показать подсказки"}
+            >
+              <HelpCircle size={18} />
+            </button>
             <button type="button" onClick={clearMessages} aria-label="Очистить историю">
               <Trash2 size={18} />
             </button>
@@ -122,6 +135,21 @@ function ChatWidget() {
           {messages.map((message) => (
             <article className={`chat-message chat-message--${message.role}`} key={message.id}>
               <p>{message.content}</p>
+              {message.actions?.length ? (
+                <div className="chat-message__actions">
+                  {message.actions.map((action) =>
+                    action.href?.startsWith("/") ? (
+                      <Link key={action.id} to={action.href}>
+                        {action.label}
+                      </Link>
+                    ) : action.href ? (
+                      <a key={action.id} href={action.href}>
+                        {action.label}
+                      </a>
+                    ) : null,
+                  )}
+                </div>
+              ) : null}
             </article>
           ))}
           {isSending ? (
@@ -133,13 +161,35 @@ function ChatWidget() {
           ) : null}
         </div>
 
-        <div className="chat-quick" aria-label="Быстрые вопросы">
-          {chatQuickQuestions.map((question) => (
-            <button type="button" key={question} disabled={isSending} onClick={() => void send(question)}>
-              {question}
-            </button>
-          ))}
-        </div>
+        {quickActionsVisible ? (
+          <div className="chat-quick" aria-label="Быстрые вопросы">
+            <div className="chat-quick__head">
+              <strong>Быстрые подсказки</strong>
+              <button type="button" onClick={() => setQuickActionsVisible(false)}>
+                Скрыть
+              </button>
+            </div>
+            <div className="chat-quick__grid">
+              {chatQuickActions.map((action) => (
+                <button type="button" key={action.id} disabled={isSending} onClick={() => sendQuickAction(action)}>
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <button type="button" className="chat-hints-button" onClick={() => setQuickActionsVisible(true)}>
+            <Sparkles size={16} />
+            Подсказки
+          </button>
+        )}
+
+        {lastFailedRequest ? (
+          <button type="button" className="chat-retry" disabled={isSending} onClick={retryLastFailed}>
+            <RotateCcw size={16} />
+            Повторить последний вопрос
+          </button>
+        ) : null}
 
         <form className="chat-form" onSubmit={handleSubmit}>
           <label className="visually-hidden" htmlFor="chat-message">

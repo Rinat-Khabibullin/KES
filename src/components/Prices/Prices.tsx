@@ -1,13 +1,8 @@
 import { Calculator, Camera, MessageCircle, PhoneCall, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { landingPriceLegacyNumbers } from "../../data/prices";
+import { landingPriceHighlights } from "../../data/prices";
 import { phoneHref } from "../../data/site";
-import { getServiceByLegacyNumber } from "../../shared/estimate/catalog";
-import { formatPrice, unitPriceLabels } from "../../shared/estimate/format";
-
-const landingPrices = landingPriceLegacyNumbers
-  .map((legacyNumber) => getServiceByLegacyNumber(legacyNumber))
-  .filter((service): service is NonNullable<typeof service> => Boolean(service));
+import { loadCalculatorPage } from "../../routes/lazyRoutes";
 
 function Prices() {
   return (
@@ -38,12 +33,12 @@ function Prices() {
         </div>
         <div className="price-landing">
           <div className="price-strip" aria-label="Популярные расценки">
-            {landingPrices.map((service) => (
-              <article className="price-strip-card" key={service.id}>
+            {landingPriceHighlights.map((service) => (
+              <article className="price-strip-card" key={service.legacyNumber}>
                 <span>№{service.legacyNumber}</span>
                 <h3>{service.name}</h3>
                 <strong>
-                  {formatPrice(service.price)} {unitPriceLabels[service.unit]}
+                  {service.priceLabel} {service.unitLabel}
                 </strong>
               </article>
             ))}
@@ -56,7 +51,13 @@ function Prices() {
               электроточки и передача расчёта в чат.
             </p>
             <div className="price-cta-panel__actions">
-              <Link className="button button--primary" to="/calculator">
+              <Link
+                className="button button--primary"
+                to="/calculator"
+                onFocus={() => void loadCalculatorPage()}
+                onPointerEnter={() => void loadCalculatorPage()}
+                onPointerDown={() => void loadCalculatorPage()}
+              >
                 <Calculator size={18} />
                 Рассчитать смету
               </Link>

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { chatGreeting, chatInputLimit } from "../data/chat";
+import { resolveChatQuickAction, resolveLocalCatalogQuestion } from "../chat/localResponses";
+import { chatGreeting, chatInputLimit, type ChatQuickAction } from "../data/chat";
 import { ChatClientError, sendChatMessage } from "../api/chatClient";
-import type { ChatApiMessage, ChatEstimateContext, ChatMessage } from "../types/chat";
+import type { ChatApiMessage, ChatEstimateContext, ChatMessage, ChatMessageAction } from "../types/chat";
 
 const storageKey = "elektrika-tuapse-chat-history";
 const requestTimeoutMs = 35_000;
@@ -14,12 +15,18 @@ const welcomeMessage = (): ChatMessage => ({
   source: "local",
 });
 
-const createMessage = (role: ChatMessage["role"], content: string, source?: ChatMessage["source"]): ChatMessage => ({
+const createMessage = (
+  role: ChatMessage["role"],
+  content: string,
+  source?: ChatMessage["source"],
+  actions?: ChatMessageAction[],
+): ChatMessage => ({
   id: `${role}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
   role,
   content,
   createdAt: Date.now(),
   source,
+  actions,
 });
 
 const loadMessages = () => {
@@ -48,6 +55,13 @@ export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
   const [isSending, setIsSending] = useState(false);
   const [draft, setDraft] = useState("");
+  const [quickActionsVisible, setQuickActionsVisible] = useState(
+    () => messages.filter((message) => message.id !== "welcome").length === 0,
+  );
+  const [lastFailedRequest, setLastFailedRequest] = useState<{
+    message: string;
+    estimateContext?: ChatEstimateContext;
+  } | null>(null);
   const sendingRef = useRef(false);
 
   useEffect(() => {
@@ -74,6 +88,8 @@ export const useChat = () => {
   const clearMessages = useCallback(() => {
     setMessages([welcomeMessage()]);
     setDraft("");
+    setQuickActionsVisible(true);
+    setLastFailedRequest(null);
   }, []);
 
   const send = useCallback(
@@ -100,6 +116,19 @@ export const useChat = () => {
       sendingRef.current = true;
       setMessages((current) => [...current, userMessage]);
       setDraft("");
+      setQuickActionsVisible(false);
+
+      const localResponse = estimateContext ? undefined : resolveLocalCatalogQuestion(message);
+      if (localResponse) {
+        setMessages((current) => [
+          ...current,
+          createMessage("assistant", localResponse.content, "local", localResponse.actions),
+        ]);
+        sendingRef.current = false;
+        setLastFailedRequest(null);
+        return;
+      }
+
       setIsSending(true);
 
       const controller = new AbortController();
@@ -113,6 +142,7 @@ export const useChat = () => {
           signal: controller.signal,
         });
         setMessages((current) => [...current, createMessage("assistant", response.reply, response.source)]);
+        setLastFailedRequest(null);
       } catch (error) {
         const fallback =
           error instanceof ChatClientError
@@ -122,6 +152,7 @@ export const useChat = () => {
               : "Не удалось связаться с помощником. Можно позвонить нам или открыть Авито — консультация бесплатная.";
 
         setMessages((current) => [...current, createMessage("assistant", fallback, "local")]);
+        setLastFailedRequest({ message, estimateContext });
       } finally {
         sendingRef.current = false;
         window.clearTimeout(timeoutId);
@@ -130,6 +161,33 @@ export const useChat = () => {
     },
     [compactHistory, draft],
   );
+
+  const sendQuickAction = useCallback((action: ChatQuickAction) => {
+    const localResponse = resolveChatQuickAction(action);
+
+    setQuickActionsVisible(false);
+    setDraft("");
+
+    if (localResponse) {
+      setMessages((current) => [
+        ...current,
+        createMessage("user", action.label),
+        createMessage("assistant", localResponse.content, "local", localResponse.actions),
+      ]);
+      setLastFailedRequest(null);
+      return;
+    }
+
+    void send(action.label);
+  }, [send]);
+
+  const retryLastFailed = useCallback(() => {
+    if (!lastFailedRequest) {
+      return;
+    }
+
+    void send(lastFailedRequest.message, lastFailedRequest.estimateContext);
+  }, [lastFailedRequest, send]);
 
   useEffect(() => {
     const handleChatOpen = () => setIsOpen(true);
@@ -157,9 +215,14 @@ export const useChat = () => {
     draft,
     isOpen,
     isSending,
+    lastFailedRequest,
     messages,
+    quickActionsVisible,
+    retryLastFailed,
     send,
+    sendQuickAction,
     setDraft,
     setIsOpen,
+    setQuickActionsVisible,
   };
 };

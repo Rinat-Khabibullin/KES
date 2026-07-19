@@ -49,7 +49,7 @@ export const handlePriceSearchRequest = async (request: Request) => {
     );
   }
 
-  return sendJson(
+  const response = sendJson(
     request,
     200,
     {
@@ -62,6 +62,9 @@ export const handlePriceSearchRequest = async (request: Request) => {
     },
     "GET, OPTIONS",
   );
+  response.headers.set("Cache-Control", "public, max-age=600, s-maxage=3600, stale-while-revalidate=86400");
+
+  return response;
 };
 
 export const GET = handlePriceSearchRequest;

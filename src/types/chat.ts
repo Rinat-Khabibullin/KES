@@ -8,6 +8,14 @@ export type ChatMessage = {
   content: string;
   createdAt: number;
   source?: "gigachat" | "local";
+  actions?: ChatMessageAction[];
+};
+
+export type ChatMessageAction = {
+  id: string;
+  label: string;
+  href?: string;
+  eventName?: "chat:open";
 };
 
 export type ChatApiMessage = {

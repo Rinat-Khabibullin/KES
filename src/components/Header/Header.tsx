@@ -2,6 +2,7 @@ import { Menu, PhoneCall, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { avitoUrl, brandCaption, brandName, phoneHref } from "../../data/site";
+import { loadCalculatorPage } from "../../routes/lazyRoutes";
 import BrandMark from "../BrandMark/BrandMark";
 
 type NavItem = { hash: string; label: string; to?: never } | { to: string; label: string; hash?: never };
@@ -66,6 +67,12 @@ function Header() {
     return location.pathname === "/" ? `#${item.hash}` : `/#${item.hash}`;
   };
 
+  const preloadRoute = (item: NavItem) => {
+    if (item.to === "/calculator") {
+      void loadCalculatorPage();
+    }
+  };
+
   return (
     <header className="site-header">
       <div className="container site-header__inner">
@@ -80,7 +87,13 @@ function Header() {
         </Link>
         <nav className="site-nav" aria-label="Основная навигация">
           {navItems.map((item) => (
-            <Link key={item.label} to={getNavTarget(item)}>
+            <Link
+              key={item.label}
+              to={getNavTarget(item)}
+              onFocus={() => preloadRoute(item)}
+              onPointerEnter={() => preloadRoute(item)}
+              onPointerDown={() => preloadRoute(item)}
+            >
               {item.label}
             </Link>
           ))}
@@ -107,7 +120,13 @@ function Header() {
       <div className={`mobile-menu ${isMenuOpen ? "mobile-menu--open" : ""}`} id="mobile-menu" ref={panelRef}>
         <nav aria-label="Мобильная навигация">
           {navItems.map((item) => (
-            <Link key={item.label} to={getNavTarget(item)}>
+            <Link
+              key={item.label}
+              to={getNavTarget(item)}
+              onFocus={() => preloadRoute(item)}
+              onPointerEnter={() => preloadRoute(item)}
+              onPointerDown={() => preloadRoute(item)}
+            >
               {item.label}
             </Link>
           ))}

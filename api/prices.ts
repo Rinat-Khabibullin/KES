@@ -26,7 +26,7 @@ export const handlePricesRequest = async (request: Request) => {
     );
   }
 
-  return sendJson(
+  const response = sendJson(
     request,
     200,
     {
@@ -37,6 +37,10 @@ export const handlePricesRequest = async (request: Request) => {
     },
     "GET, OPTIONS",
   );
+  response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800");
+  response.headers.set("ETag", `"${estimateCatalogVersion}"`);
+
+  return response;
 };
 
 export const GET = handlePricesRequest;

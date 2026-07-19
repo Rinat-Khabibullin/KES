@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import type { PortfolioItem } from "./data/portfolio";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
-import Modal from "./components/Modal/Modal";
-import ChatWidget from "./components/ChatWidget/ChatWidget";
 import LandingPage from "./pages/LandingPage/LandingPage";
-import CalculatorPage from "./pages/CalculatorPage/CalculatorPage";
-import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import MobileActions from "./components/MobileActions/MobileActions";
+import ScrollToHash from "./components/ScrollToHash/ScrollToHash";
+import ChatMount from "./components/ChatMount/ChatMount";
+import { CalculatorPage, NotFoundPage, PortfolioModal } from "./routes/lazyRoutes";
 
 const pageMeta = {
   "/": {
@@ -23,6 +22,22 @@ const pageMeta = {
       "Онлайн-калькулятор электромонтажных работ в Туапсе: розетки, свет, кабель, штробление, щиты, тёплый пол. Предварительная смета по прайсу, материалы отдельно.",
     canonical: "https://www.electrik-tuapse.ru/calculator",
   },
+};
+
+const scheduleAfterIdle = (callback: () => void) => {
+  const browserWindow = window as Window &
+    typeof globalThis & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
+  if (browserWindow.requestIdleCallback && browserWindow.cancelIdleCallback) {
+    const idleId = browserWindow.requestIdleCallback(callback, { timeout: 1_200 });
+    return () => browserWindow.cancelIdleCallback?.(idleId);
+  }
+
+  const timeoutId = window.setTimeout(callback, 160);
+  return () => window.clearTimeout(timeoutId);
 };
 
 function usePageEffects() {
@@ -55,78 +70,60 @@ function usePageEffects() {
       return;
     }
 
-    const selectors = [
-      ".section-heading",
-      ".hero__content",
-      ".hero-showcase",
-      ".benefit-card",
-      ".service-card",
-      ".object-card",
-      ".portfolio-card",
-      ".photo-estimate__content",
-      ".photo-estimate__panel",
-      ".price-note",
-      ".price-strip-card",
-      ".price-cta-panel",
-      ".calculator-page__hero",
-      ".calculator-page__note",
-      ".price-card",
-      ".process-card",
-      ".partner-card",
-      ".partner-proof",
-      ".area-list span",
-      ".guarantee__panel",
-      "details",
-      ".contact-card",
-    ].join(", ");
-    const targets = Array.from(document.querySelectorAll<HTMLElement>(selectors));
+    let observer: IntersectionObserver | null = null;
 
-    targets.forEach((target, index) => {
-      target.classList.add("reveal");
-      target.style.setProperty("--reveal-delay", `${Math.min((index % 8) * 55, 330)}ms`);
+    const cancelIdle = scheduleAfterIdle(() => {
+      const selectors = [
+        ".section-heading",
+        ".hero__content",
+        ".hero-showcase",
+        ".benefit-card",
+        ".service-card",
+        ".object-card",
+        ".portfolio-card",
+        ".photo-estimate__content",
+        ".photo-estimate__panel",
+        ".price-note",
+        ".price-strip-card",
+        ".price-cta-panel",
+        ".calculator-page__hero",
+        ".calculator-page__note",
+        ".price-card",
+        ".process-card",
+        ".partner-card",
+        ".partner-proof",
+        ".area-list span",
+        ".guarantee__panel",
+        "details",
+        ".contact-card",
+      ].join(", ");
+      const targets = Array.from(document.querySelectorAll<HTMLElement>(selectors));
+
+      targets.forEach((target, index) => {
+        target.classList.add("reveal");
+        target.style.setProperty("--reveal-delay", `${Math.min((index % 8) * 55, 330)}ms`);
+      });
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer?.unobserve(entry.target);
+            }
+          });
+        },
+        { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
+      );
+
+      targets.forEach((target) => observer?.observe(target));
     });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
-    );
-
-    targets.forEach((target) => observer.observe(target));
-
-    return () => observer.disconnect();
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (!location.hash) {
-      return;
-    }
-
-    const hash = location.hash.slice(1);
-    const scrollToHash = () => {
-      const target = document.getElementById(hash);
-      const heading = target?.querySelector<HTMLElement>("h1, h2");
-      const anchor = heading ?? target;
-
-      if (!anchor) {
-        return;
-      }
-
-      const headerHeight = document.querySelector<HTMLElement>(".site-header")?.offsetHeight ?? 0;
-      const top = anchor.getBoundingClientRect().top + window.scrollY - headerHeight - 22;
-      window.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+    return () => {
+      cancelIdle();
+      observer?.disconnect();
     };
-
-    const timeoutIds = [80, 360, 900].map((delay) => window.setTimeout(scrollToHash, delay));
-
-    return () => timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
-  }, [location.hash, location.pathname]);
+  }, [location.pathname]);
 }
 
 function App() {
@@ -135,15 +132,25 @@ function App() {
 
   return (
     <>
+      <a className="skip-link" href="#main-content">
+        Перейти к основному содержимому
+      </a>
       <Header />
-      <Routes>
-        <Route path="/" element={<LandingPage onOpenWork={setActiveWork} />} />
-        <Route path="/calculator" element={<CalculatorPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <ScrollToHash />
+      <Suspense fallback={<div className="route-skeleton" aria-busy="true" aria-label="Загрузка страницы" />}>
+        <Routes>
+          <Route path="/" element={<LandingPage onOpenWork={setActiveWork} />} />
+          <Route path="/calculator" element={<CalculatorPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
       <Footer />
-      <Modal item={activeWork} onClose={() => setActiveWork(null)} />
-      <ChatWidget />
+      {activeWork ? (
+        <Suspense fallback={null}>
+          <PortfolioModal item={activeWork} onClose={() => setActiveWork(null)} />
+        </Suspense>
+      ) : null}
+      <ChatMount />
       <MobileActions />
     </>
   );
