@@ -69,8 +69,7 @@ export const buildModelMessages = (
     .slice(-chatModelConfig.maxHistoryMessages);
 
   return [
-    { role: "system", content: systemPrompt },
-    ...(pricingContext ? [{ role: "system" as const, content: pricingContext }] : []),
+    { role: "system", content: pricingContext ? `${systemPrompt}\n\n${pricingContext}` : systemPrompt },
     ...preparedHistory,
     { role: "user", content: message.trim().slice(0, chatModelConfig.maxInputLength) },
   ];

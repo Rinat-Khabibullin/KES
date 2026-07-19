@@ -2,7 +2,8 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import { Readable } from "node:stream";
 import calculateEstimateApi from "./api/estimate/calculate";
-import chatApi from "./api/chat";
+import { handleChatRequest } from "./api/chat";
+import { handleChatHealthRequest } from "./api/health/chat";
 import pricesApi from "./api/prices";
 import priceSearchApi from "./api/prices/search";
 
@@ -11,7 +12,8 @@ type LocalApiHandler = {
 };
 
 const apiRoutes = new Map<string, LocalApiHandler>([
-  ["/api/chat", chatApi],
+  ["/api/chat", { fetch: handleChatRequest }],
+  ["/api/health/chat", { fetch: handleChatHealthRequest }],
   ["/api/prices", pricesApi],
   ["/api/prices/search", priceSearchApi],
   ["/api/estimate/calculate", calculateEstimateApi],
@@ -52,7 +54,8 @@ const localApiRoutes = (): Plugin => ({
           }
         }
 
-        const webRequest = new Request(`http://localhost${request.url || "/api/chat"}`, {
+        const host = headers.get("host") || "localhost";
+        const webRequest = new Request(`http://${host}${request.url || "/api/chat"}`, {
           method,
           headers,
           body: method === "GET" || method === "HEAD" ? undefined : Readable.toWeb(request),

@@ -12,6 +12,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: hidden;
   background:
     linear-gradient(115deg, rgba(18, 155, 255, 0.12) 0 1px, transparent 1px 22%),
     linear-gradient(180deg, #0b0f14 0%, #0d1218 34%, #070a0f 100%);
@@ -46,6 +47,10 @@ body::after {
 }
 
 body.is-modal-open {
+  overflow: hidden;
+}
+
+body.is-nav-open {
   overflow: hidden;
 }
 
@@ -259,6 +264,8 @@ p {
 .chat-panel button:focus-visible,
 .chat-panel textarea:focus-visible,
 .chat-panel__call:focus-visible,
+.site-menu-toggle:focus-visible,
+.mobile-menu a:focus-visible,
 .estimate-calculator input:focus-visible,
 .estimate-calculator select:focus-visible,
 .estimate-calculator button:focus-visible,
@@ -323,6 +330,43 @@ summary:focus-visible {
 
 .site-header .button {
   white-space: nowrap;
+}
+
+.site-header__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-menu-toggle {
+  display: none;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 15px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03)),
+    rgba(13, 19, 27, 0.92);
+  color: var(--text-main);
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.site-menu-toggle:hover {
+  border-color: rgba(18, 155, 255, 0.48);
+  background: rgba(18, 155, 255, 0.13);
+  box-shadow: 0 0 28px rgba(18, 155, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.mobile-menu {
+  display: none;
 }
 
 .logo {
@@ -1188,6 +1232,201 @@ summary:focus-visible {
   color: var(--text-muted);
 }
 
+.price-landing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.price-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.price-strip-card,
+.price-cta-panel,
+.calculator-page__hero,
+.calculator-page__note,
+.not-found__content {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.078), rgba(255, 255, 255, 0.022)),
+    rgba(18, 25, 35, 0.82);
+  box-shadow: 0 20px 62px rgba(0, 0, 0, 0.22);
+}
+
+.price-strip-card {
+  position: relative;
+  display: grid;
+  min-height: 164px;
+  align-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  overflow: hidden;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.price-strip-card::before,
+.price-cta-panel::before,
+.calculator-page__hero::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(18, 155, 255, 0.16), transparent 44%),
+    linear-gradient(315deg, rgba(255, 176, 32, 0.12), transparent 46%);
+  content: "";
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.price-strip-card:hover {
+  border-color: rgba(18, 155, 255, 0.42);
+  box-shadow: 0 24px 70px rgba(18, 155, 255, 0.14);
+  transform: translateY(-4px);
+}
+
+.price-strip-card > *,
+.price-cta-panel > *,
+.calculator-page__hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.price-strip-card span {
+  width: max-content;
+  border: 1px solid rgba(18, 155, 255, 0.28);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(18, 155, 255, 0.09);
+  color: var(--cyan);
+  font-size: 0.75rem;
+  font-weight: 950;
+}
+
+.price-strip-card h3 {
+  font-size: 1rem;
+  line-height: 1.24;
+}
+
+.price-strip-card strong {
+  color: #ffd28a;
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.price-cta-panel {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.price-cta-panel svg {
+  color: var(--amber);
+}
+
+.price-cta-panel h3 {
+  font-size: 1.45rem;
+}
+
+.price-cta-panel__actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.calculator-page {
+  padding-top: 56px;
+}
+
+.calculator-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: var(--text-soft);
+  font-size: 0.94rem;
+  font-weight: 880;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.calculator-page__back:hover {
+  color: var(--text-main);
+  transform: translateX(-3px);
+}
+
+.calculator-page__hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.28fr);
+  gap: 28px;
+  align-items: end;
+  padding: 34px;
+  overflow: hidden;
+}
+
+.calculator-page__hero h1,
+.not-found h1 {
+  max-width: 900px;
+  font-size: clamp(2.55rem, 5vw, 4.25rem);
+}
+
+.calculator-page__hero p:not(.eyebrow),
+.not-found__content > p:not(.eyebrow) {
+  max-width: 800px;
+  margin-top: 18px;
+  color: var(--text-soft);
+  font-size: 1.1rem;
+}
+
+.calculator-page__actions {
+  display: grid;
+  gap: 10px;
+}
+
+.calculator-page__note,
+.not-found__content {
+  padding: 24px;
+}
+
+.calculator-page__note strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 1.08rem;
+}
+
+.calculator-page__note p {
+  margin-top: 8px;
+  color: var(--text-soft);
+}
+
+.not-found {
+  min-height: calc(100dvh - var(--header-height));
+  display: grid;
+  align-items: center;
+}
+
+.not-found__content {
+  max-width: 760px;
+}
+
+.not-found__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
 .estimate-calculator {
   position: relative;
   margin: 30px 0 54px;
@@ -1392,7 +1631,7 @@ summary:focus-visible {
 
 .new-point-wizard__head {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
 }
@@ -1418,6 +1657,38 @@ summary:focus-visible {
 .new-point-wizard__head p {
   margin-top: 4px;
   font-size: 0.9rem;
+}
+
+.new-point-wizard__head button,
+.estimate-more-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 176, 32, 0.28);
+  border-radius: 12px;
+  padding: 9px 13px;
+  background: rgba(255, 176, 32, 0.095);
+  color: var(--text-main);
+  font-size: 0.86rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.new-point-wizard__head button:hover,
+.estimate-more-button:hover {
+  border-color: rgba(18, 155, 255, 0.44);
+  background: rgba(18, 155, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.new-point-wizard__body {
+  display: grid;
+  gap: 13px;
 }
 
 .new-point-wizard__grid {
@@ -1447,6 +1718,14 @@ summary:focus-visible {
   color: var(--text-muted);
   font-size: 0.86rem;
   font-weight: 850;
+}
+
+.estimate-more-button {
+  width: 100%;
+  border-color: rgba(18, 155, 255, 0.28);
+  background:
+    linear-gradient(135deg, rgba(18, 155, 255, 0.11), rgba(255, 176, 32, 0.07)),
+    rgba(255, 255, 255, 0.04);
 }
 
 .estimate-service-card {
@@ -2410,6 +2689,7 @@ details p {
 
 .chat-messages {
   display: grid;
+  min-height: 0;
   align-content: start;
   gap: 10px;
   overflow-y: auto;
@@ -2595,6 +2875,7 @@ details p {
   background: rgba(255, 176, 32, 0.1);
   color: var(--text-main);
   font-weight: 950;
+  cursor: pointer;
 }
 
 .mobile-cta__button--primary {
@@ -2663,6 +2944,76 @@ details p {
     display: none;
   }
 
+  .site-menu-toggle {
+    display: grid;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    top: calc(100% - 4px);
+    right: max(20px, env(safe-area-inset-right));
+    z-index: 35;
+    display: grid;
+    width: min(380px, calc(100vw - 40px));
+    gap: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 22px;
+    padding: 14px;
+    background:
+      linear-gradient(145deg, rgba(27, 38, 51, 0.97), rgba(8, 12, 18, 0.97)),
+      #0b0f14;
+    box-shadow:
+      0 28px 90px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.11);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px) scale(0.98);
+    transform-origin: 100% 0;
+    transition:
+      opacity 180ms ease,
+      transform 220ms ease,
+      visibility 180ms ease;
+    visibility: hidden;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .mobile-menu--open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+  }
+
+  .mobile-menu nav {
+    display: grid;
+    gap: 8px;
+  }
+
+  .mobile-menu nav a {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--text-soft);
+    font-weight: 900;
+    transition:
+      border-color 180ms ease,
+      background 180ms ease,
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .mobile-menu nav a:hover {
+    border-color: rgba(18, 155, 255, 0.32);
+    background: rgba(18, 155, 255, 0.1);
+    color: var(--text-main);
+    transform: translateX(2px);
+  }
+
   .hero__grid,
   .areas,
   .guarantee,
@@ -2723,7 +3074,7 @@ details p {
     padding: 9px 9px;
   }
 
-  .site-header .button {
+  .site-header__actions .button {
     max-width: 210px;
   }
 }
@@ -2731,6 +3082,14 @@ details p {
 @media (max-width: 760px) {
   :root {
     --header-height: 72px;
+  }
+
+  body {
+    padding-bottom: calc(86px + env(safe-area-inset-bottom));
+  }
+
+  body.is-chat-open {
+    overflow: hidden;
   }
 
   .container {
@@ -2758,26 +3117,64 @@ details p {
     padding: 9px 0;
   }
 
-  .site-header .button {
-    display: none;
+  .site-header__actions {
+    gap: 6px;
   }
 
-  .site-header__inner {
-    border-radius: 18px;
-    padding: 8px;
+  .site-header__actions .button {
+    width: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 0;
+    font-size: 0;
   }
 
-  .logo__mark {
+  .site-menu-toggle {
     width: 42px;
     height: 42px;
   }
 
+  .site-header__inner {
+    gap: 8px;
+    border-radius: 18px;
+    padding: 8px;
+  }
+
+  .logo {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .logo__mark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+  }
+
   .logo__text strong {
-    font-size: 0.98rem;
+    font-size: 0.92rem;
+  }
+
+  .mobile-menu {
+    right: 14px;
+    width: calc(100vw - 28px);
   }
 
   .hero {
     padding-top: 46px;
+  }
+
+  .hero__cables {
+    display: none;
+  }
+
+  .hero-ribbon {
+    flex-wrap: wrap;
+    animation: none;
   }
 
   .hero__grid {
@@ -2847,6 +3244,36 @@ details p {
     grid-template-columns: 1fr;
   }
 
+  .price-note .button {
+    width: 100%;
+  }
+
+  .price-landing,
+  .calculator-page__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .price-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .price-strip-card {
+    min-height: 132px;
+  }
+
+  .calculator-page {
+    padding-top: 38px;
+  }
+
+  .calculator-page__hero,
+  .calculator-page__note {
+    padding: 22px;
+  }
+
+  .calculator-page__actions {
+    grid-template-columns: 1fr;
+  }
+
   .estimate-calculator {
     border-radius: 18px;
     padding: 14px;
@@ -2869,6 +3296,20 @@ details p {
 
   .new-point-wizard__grid {
     grid-template-columns: 1fr;
+  }
+
+  .new-point-wizard__head {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .new-point-wizard__head > span {
+    width: 38px;
+    height: 38px;
+  }
+
+  .new-point-wizard__head button {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .new-point-wizard .button {
@@ -2935,35 +3376,65 @@ details p {
 
   .mobile-cta {
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    padding: 8px;
+    transition:
+      opacity 180ms ease,
+      transform 220ms ease,
+      visibility 180ms ease;
+  }
+
+  body.is-chat-open .mobile-cta {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(calc(100% + 22px));
+    visibility: hidden;
+  }
+
+  .mobile-cta__button {
+    min-height: 56px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 7px 6px;
+    font-size: 0.78rem;
+    line-height: 1.1;
   }
 
   .chat-widget {
-    right: 14px;
-    bottom: calc(92px + env(safe-area-inset-bottom));
-    left: 14px;
-    justify-items: stretch;
+    inset: 0;
+    z-index: 70;
+    display: block;
+    pointer-events: none;
   }
 
   .chat-launcher {
-    width: 100%;
-    grid-template-columns: 48px minmax(0, 1fr);
-    min-height: 66px;
+    display: none;
   }
 
   .chat-panel {
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: auto;
-    height: calc(100dvh - 24px);
-    max-height: calc(100dvh - 24px);
-    border-radius: 22px;
+    position: fixed;
+    inset: 0;
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    pointer-events: none;
+    transform: translateY(100%);
+    transform-origin: 50% 100%;
   }
 
   .chat-widget--open {
-    right: 10px;
-    bottom: calc(10px + env(safe-area-inset-bottom));
-    left: 10px;
+    inset: 0;
+  }
+
+  .chat-widget--open .chat-panel {
+    pointer-events: auto;
+    transform: translateY(0);
   }
 
   .chat-panel__header {
@@ -2972,6 +3443,17 @@ details p {
 
   .chat-panel__title h2 {
     font-size: 1rem;
+  }
+
+  .chat-quick {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+  }
+
+  .chat-quick button {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+    white-space: normal;
   }
 }
 
@@ -2998,7 +3480,7 @@ details p {
   }
 
   .chat-panel {
-    grid-template-rows: auto auto minmax(180px, 1fr) auto auto auto;
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
   }
 
   .estimate-line {

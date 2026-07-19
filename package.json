@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:vercel": "vite",
+    "dev:vercel": "npx --yes vercel dev",
     "check": "tsc -b",
     "test": "vitest run",
     "build": "tsc -b && vite build",
+    "build:vercel": "npx --yes vercel build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "lucide-react": "^1.21.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.18.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.5"
   },

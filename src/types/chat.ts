@@ -25,4 +25,11 @@ export type ChatEstimateContext = {
 export type ChatApiResponse = {
   reply: string;
   source: "gigachat" | "local";
+  requestId?: string;
+};
+
+export type ChatApiErrorResponse = {
+  error: string;
+  code?: string;
+  requestId?: string;
 };

@@ -54,6 +54,11 @@ export const useChat = () => {
     window.localStorage.setItem(storageKey, JSON.stringify(messages.slice(-30)));
   }, [messages]);
 
+  useEffect(() => {
+    document.body.classList.toggle("is-chat-open", isOpen);
+    return () => document.body.classList.remove("is-chat-open");
+  }, [isOpen]);
+
   const compactHistory = useMemo<ChatApiMessage[]>(
     () =>
       messages
@@ -127,6 +132,8 @@ export const useChat = () => {
   );
 
   useEffect(() => {
+    const handleChatOpen = () => setIsOpen(true);
+
     const handleEstimateChat = (event: Event) => {
       const customEvent = event as CustomEvent<{
         message?: string;
@@ -137,8 +144,12 @@ export const useChat = () => {
       void send(customEvent.detail?.message, customEvent.detail?.estimateContext);
     };
 
+    window.addEventListener("chat:open", handleChatOpen);
     window.addEventListener("estimate-chat:send", handleEstimateChat);
-    return () => window.removeEventListener("estimate-chat:send", handleEstimateChat);
+    return () => {
+      window.removeEventListener("chat:open", handleChatOpen);
+      window.removeEventListener("estimate-chat:send", handleEstimateChat);
+    };
   }, [send]);
 
   return {

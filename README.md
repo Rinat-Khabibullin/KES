@@ -1,39 +1,27 @@
 # Электрика Туапсе
 
-Одностраничный лендинг для команды электриков в Туапсе и районе.
+Сайт электромонтажных услуг в Туапсе и районе.
 
 ## Ссылки
 
+- Сайт: https://www.electrik-tuapse.ru/
+- Калькулятор: https://www.electrik-tuapse.ru/calculator
 - Репозиторий: https://github.com/Rinat-Khabibullin/KES
 
-## Запуск локально
+## Запуск
 
 ```bash
 npm install
 npm run dev
 ```
 
-В dev-режиме Vite сам обслуживает `/api/chat`, поэтому Vercel CLI и авторизация в Vercel для локального запуска не нужны.
+`npm run dev` запускает Vite и локальный middleware для `/api/*`.
 
-## Переменные окружения
-
-Добавить локально в `.env.local`, а на Vercel в Project Settings -> Environment Variables:
-
-```env
-GIGACHAT_CREDENTIALS=
-GIGACHAT_SCOPE=GIGACHAT_API_PERS
-GIGACHAT_MODEL=GigaChat-2
-GIGACHAT_TIMEOUT=30
-GIGACHAT_VERIFY_SSL=false
-LLM_CORS_ORIGIN=http://localhost:5173
-```
-
-`GIGACHAT_AUTH_URL`, `GIGACHAT_API_URL` и `GIGACHAT_CA_CERT_PATH` можно оставить как в `.env.example`, если не нужны переопределения.
-
-## Сборка
+Для проверки реального Vercel runtime:
 
 ```bash
-npm run build
+npm run dev:vercel
+npm run build:vercel
 ```
 
 ## Проверки
@@ -42,7 +30,44 @@ npm run build
 npm run check
 npm run test
 npm run build
+npm run build:vercel
 ```
+
+## Страницы
+
+- `/` — продающий лендинг.
+- `/calculator` — полный калькулятор электромонтажных работ.
+- Неизвестный маршрут показывает страницу возврата на главную.
+
+SPA rewrite настроен в `vercel.json`; `/api/*`, ассеты, фото работ и файлы с расширением не переписываются в `index.html`.
+
+## Переменные окружения
+
+Локально значения лежат в `.env.local`. На Vercel добавить эти же переменные в Project Settings -> Environment Variables отдельно для Development, Preview и Production:
+
+```env
+GIGACHAT_CREDENTIALS=
+GIGACHAT_SCOPE=GIGACHAT_API_PERS
+GIGACHAT_MODEL=GigaChat-2
+GIGACHAT_TIMEOUT=30
+GIGACHAT_VERIFY_SSL=true
+GIGACHAT_AUTH_URL=https://ngw.devices.sberbank.ru:9443/api/v2/oauth
+GIGACHAT_API_URL=https://api.giga.chat/v1/chat/completions
+GIGACHAT_CA_CERT_BASE64=
+LLM_CORS_ORIGINS=https://electrik-tuapse.ru,https://www.electrik-tuapse.ru
+```
+
+Для локальной диагностики допускается `GIGACHAT_VERIFY_SSL=false`. В Production лучше использовать `true` и передать сертификат через `GIGACHAT_CA_CERT_BASE64` или `GIGACHAT_CA_CERT_PATH`.
+
+После изменения переменных на Vercel нужен новый deployment.
+
+## Диагностика чата
+
+- `GET /api/health/chat` — безопасная проверка окружения без OAuth-запроса.
+- `POST /api/chat` — основной endpoint помощника.
+- `OPTIONS /api/chat` — CORS preflight.
+
+Health endpoint не возвращает ключи, токены и содержимое сертификата.
 
 ## Прайс и калькулятор
 
@@ -58,13 +83,7 @@ API:
 - `GET /api/prices/search?q=розетка`
 - `POST /api/estimate/calculate`
 
-Чтобы изменить цену, правьте одну строку в `src/shared/estimate/catalog.ts`, затем запускайте:
-
-```bash
-npm run check
-npm run test
-npm run build
-```
+Чтобы изменить цену, правьте одну строку в `src/shared/estimate/catalog.ts`, затем запускайте проверки.
 
 Для повторной проверки исходного XLSX:
 
@@ -72,13 +91,14 @@ npm run build
 python3 scripts/extract-price-catalog.py "/path/to/смета_электромонтаж_полная.xlsx"
 ```
 
-## Настройка чата
+## Чат
 
 - Системный промпт и настройки модели: `api/_chat/prompt.ts`
-- Контекст сайта для помощника: `api/_chat/siteContext.ts`
+- Контекст сайта: `api/_chat/siteContext.ts`
+- Фильтр тем: `api/_chat/guards.ts`
 - Связь чата с прайсом и расчетом: `api/_chat/priceContext.ts`
-- Быстрые вопросы и приветствие: `src/data/chat.ts`
-- Серверный endpoint: `api/chat.ts`
+- GigaChat HTTP-клиент: `api/_chat/gigachatClient.ts`
+- Runtime config/CORS/health: `api/_chat/runtime.ts`
 - UI виджета: `src/components/ChatWidget/ChatWidget.tsx`
 
 Деплой на Vercel выполняется автоматически при push в ветку `main`, если проект подключен к этому репозиторию.

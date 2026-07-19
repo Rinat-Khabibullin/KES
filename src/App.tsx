@@ -1,26 +1,54 @@
 import { useEffect, useState } from "react";
-import { portfolioItems, type PortfolioItem } from "./data/portfolio";
+import { Route, Routes, useLocation } from "react-router-dom";
+import type { PortfolioItem } from "./data/portfolio";
 import Header from "./components/Header/Header";
-import Hero from "./components/Hero/Hero";
-import Benefits from "./components/Benefits/Benefits";
-import Services from "./components/Services/Services";
-import Portfolio from "./components/Portfolio/Portfolio";
-import PhotoEstimate from "./components/PhotoEstimate/PhotoEstimate";
-import Prices from "./components/Prices/Prices";
-import Process from "./components/Process/Process";
-import ObjectTypes from "./components/ObjectTypes/ObjectTypes";
-import Areas from "./components/Areas/Areas";
-import Guarantee from "./components/Guarantee/Guarantee";
-import FAQ from "./components/FAQ/FAQ";
-import Contact from "./components/Contact/Contact";
 import Footer from "./components/Footer/Footer";
 import Modal from "./components/Modal/Modal";
-import { avitoUrl, phoneHref } from "./data/site";
-import Partners from "./components/Partners/Partners";
 import ChatWidget from "./components/ChatWidget/ChatWidget";
+import LandingPage from "./pages/LandingPage/LandingPage";
+import CalculatorPage from "./pages/CalculatorPage/CalculatorPage";
+import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+import MobileActions from "./components/MobileActions/MobileActions";
 
-function App() {
-  const [activeWork, setActiveWork] = useState<PortfolioItem | null>(null);
+const pageMeta = {
+  "/": {
+    title: "Электрика Туапсе — электрик, электромонтаж, щиты | Команда электриков",
+    description:
+      "Электрик и электромонтаж в Туапсе и районе: щиты, проводка, розетки, освещение, тёплый пол, аварийный ремонт. Бесплатная консультация, договор, гарантия, опыт 10+ лет.",
+    canonical: "https://www.electrik-tuapse.ru/",
+  },
+  "/calculator": {
+    title: "Калькулятор электромонтажных работ в Туапсе | Электрика Туапсе",
+    description:
+      "Онлайн-калькулятор электромонтажных работ в Туапсе: розетки, свет, кабель, штробление, щиты, тёплый пол. Предварительная смета по прайсу, материалы отдельно.",
+    canonical: "https://www.electrik-tuapse.ru/calculator",
+  },
+};
+
+function usePageEffects() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const meta = pageMeta[location.pathname as keyof typeof pageMeta] ?? {
+      title: "Страница не найдена | Электрика Туапсе",
+      description: "Страница не найдена. Вернитесь на главную или откройте калькулятор электромонтажных работ.",
+      canonical: "https://www.electrik-tuapse.ru/",
+    };
+    document.title = meta.title;
+
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) {
+      description.content = meta.description;
+    }
+
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.append(canonical);
+    }
+    canonical.href = meta.canonical;
+  }, [location.pathname]);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -38,10 +66,10 @@ function App() {
       ".photo-estimate__content",
       ".photo-estimate__panel",
       ".price-note",
-      ".estimate-calculator",
-      ".estimate-service-card",
-      ".new-point-wizard",
-      ".estimate-summary",
+      ".price-strip-card",
+      ".price-cta-panel",
+      ".calculator-page__hero",
+      ".calculator-page__note",
       ".price-card",
       ".process-card",
       ".partner-card",
@@ -73,14 +101,14 @@ function App() {
     targets.forEach((target) => observer.observe(target));
 
     return () => observer.disconnect();
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
-    if (!window.location.hash) {
+    if (!location.hash) {
       return;
     }
 
-    const hash = window.location.hash.slice(1);
+    const hash = location.hash.slice(1);
     const scrollToHash = () => {
       const target = document.getElementById(hash);
       const heading = target?.querySelector<HTMLElement>("h1, h2");
@@ -98,45 +126,25 @@ function App() {
     const timeoutIds = [80, 360, 900].map((delay) => window.setTimeout(scrollToHash, delay));
 
     return () => timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId));
-  }, []);
+  }, [location.hash, location.pathname]);
+}
+
+function App() {
+  const [activeWork, setActiveWork] = useState<PortfolioItem | null>(null);
+  usePageEffects();
 
   return (
     <>
       <Header />
-      <main>
-        <Hero />
-        <Benefits />
-        <Services />
-        <ObjectTypes />
-        <Portfolio items={portfolioItems} onOpen={setActiveWork} />
-        <PhotoEstimate />
-        <Prices />
-        <Process />
-        <Partners />
-        <Areas />
-        <Guarantee />
-        <FAQ />
-        <Contact />
-      </main>
+      <Routes>
+        <Route path="/" element={<LandingPage onOpenWork={setActiveWork} />} />
+        <Route path="/calculator" element={<CalculatorPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
       <Footer />
       <Modal item={activeWork} onClose={() => setActiveWork(null)} />
       <ChatWidget />
-      <div className="mobile-cta" aria-label="Быстрые контакты">
-        <a href={phoneHref} className="mobile-cta__button mobile-cta__button--primary">
-          Позвонить нам
-        </a>
-        <a href="#photo-estimate" className="mobile-cta__button">
-          Фото
-        </a>
-        <a
-          href={avitoUrl}
-          className="mobile-cta__button"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Авито
-        </a>
-      </div>
+      <MobileActions />
     </>
   );
 }

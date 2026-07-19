@@ -168,6 +168,8 @@ function EstimateCalculator() {
   const [wizardPointCount, setWizardPointCount] = useState("1");
   const [wizardMechanism, setWizardMechanism] = useState<PointMechanism>("socket-single");
   const [wizardLineReady, setWizardLineReady] = useState(true);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(18);
 
   const result = useMemo(() => {
     try {
@@ -206,6 +208,11 @@ function EstimateCalculator() {
   }, [activeCategory]);
 
   const visibleServices = search.trim() ? searchResults : currentCategoryServices;
+  const visibleServiceSlice = visibleServices.slice(0, visibleCount);
+
+  useEffect(() => {
+    setVisibleCount(18);
+  }, [activeCategory, search]);
 
   const setServiceQuantityInput = (serviceId: string, value: string) => {
     setQuantityInputs((current) => ({ ...current, [serviceId]: value }));
@@ -405,7 +412,7 @@ function EstimateCalculator() {
             </label>
           </div>
 
-          <div className="new-point-wizard">
+          <div className={`new-point-wizard ${isWizardOpen ? "new-point-wizard--open" : ""}`}>
             <div className="new-point-wizard__head">
               <span aria-hidden="true">
                 <Zap size={19} />
@@ -414,89 +421,101 @@ function EstimateCalculator() {
                 <h4>Новая электроточка</h4>
                 <p>Мастер добавляет только отдельные позиции прайса, без скрытой комплексной цены.</p>
               </div>
+              <button
+                type="button"
+                aria-expanded={isWizardOpen}
+                aria-controls="new-point-wizard-body"
+                onClick={() => setIsWizardOpen((current) => !current)}
+              >
+                {isWizardOpen ? "Свернуть" : "Открыть"}
+              </button>
             </div>
-            <div className="new-point-wizard__grid">
-              <label>
-                Количество
-                <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  inputMode="numeric"
-                  value={wizardPointCount}
-                  onChange={(event) => setWizardPointCount(event.target.value)}
-                />
-              </label>
-              <label>
-                Материал стены
-                <select value={wizardMaterial} onChange={(event) => setWizardMaterial(event.target.value as PointMaterial)}>
-                  {pointMaterials.map((material) => (
-                    <option value={material.value} key={material.value}>
-                      {material.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Отверстие
-                <select value={wizardHole} onChange={(event) => setWizardHole(event.target.value as "ready" | "needed" | "not-needed")}>
-                  <option value="needed">Нужно изготовить</option>
-                  <option value="ready">Уже готово</option>
-                  <option value="not-needed">Не нужно</option>
-                </select>
-              </label>
-              <label>
-                Механизм
-                <select value={wizardMechanism} onChange={(event) => setWizardMechanism(event.target.value as PointMechanism)}>
-                  {pointMechanisms.map((mechanism) => (
-                    <option value={mechanism.value} key={mechanism.value}>
-                      {mechanism.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Кабель, м.п.
-                <input
-                  type="number"
-                  min={0}
-                  step={0.5}
-                  inputMode="decimal"
-                  value={wizardCableLength}
-                  onChange={(event) => setWizardCableLength(event.target.value)}
-                />
-              </label>
-            </div>
-            <div className="new-point-wizard__checks">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={wizardNeedsPodrozetnik}
-                  onChange={(event) => setWizardNeedsPodrozetnik(event.target.checked)}
-                />
-                Нужен подрозетник
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={wizardNeedsChasing}
-                  onChange={(event) => setWizardNeedsChasing(event.target.checked)}
-                />
-                Нужно штробление
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={wizardLineReady}
-                  onChange={(event) => setWizardLineReady(event.target.checked)}
-                />
-                Линия и щит готовы
-              </label>
-            </div>
-            <button type="button" className="button button--quiet button--small" onClick={addPointScenario}>
-              <Plus size={17} />
-              Добавить состав точки
-            </button>
+            {isWizardOpen ? (
+              <div className="new-point-wizard__body" id="new-point-wizard-body">
+                <div className="new-point-wizard__grid">
+                  <label>
+                    Количество
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      inputMode="numeric"
+                      value={wizardPointCount}
+                      onChange={(event) => setWizardPointCount(event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Материал стены
+                    <select value={wizardMaterial} onChange={(event) => setWizardMaterial(event.target.value as PointMaterial)}>
+                      {pointMaterials.map((material) => (
+                        <option value={material.value} key={material.value}>
+                          {material.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Отверстие
+                    <select value={wizardHole} onChange={(event) => setWizardHole(event.target.value as "ready" | "needed" | "not-needed")}>
+                      <option value="needed">Нужно изготовить</option>
+                      <option value="ready">Уже готово</option>
+                      <option value="not-needed">Не нужно</option>
+                    </select>
+                  </label>
+                  <label>
+                    Механизм
+                    <select value={wizardMechanism} onChange={(event) => setWizardMechanism(event.target.value as PointMechanism)}>
+                      {pointMechanisms.map((mechanism) => (
+                        <option value={mechanism.value} key={mechanism.value}>
+                          {mechanism.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Кабель, м.п.
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      inputMode="decimal"
+                      value={wizardCableLength}
+                      onChange={(event) => setWizardCableLength(event.target.value)}
+                    />
+                  </label>
+                </div>
+                <div className="new-point-wizard__checks">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={wizardNeedsPodrozetnik}
+                      onChange={(event) => setWizardNeedsPodrozetnik(event.target.checked)}
+                    />
+                    Нужен подрозетник
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={wizardNeedsChasing}
+                      onChange={(event) => setWizardNeedsChasing(event.target.checked)}
+                    />
+                    Нужно штробление
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={wizardLineReady}
+                      onChange={(event) => setWizardLineReady(event.target.checked)}
+                    />
+                    Линия и щит готовы
+                  </label>
+                </div>
+                <button type="button" className="button button--quiet button--small" onClick={addPointScenario}>
+                  <Plus size={17} />
+                  Добавить состав точки
+                </button>
+              </div>
+            ) : null}
           </div>
 
           <div className="estimate-service-list" aria-live="polite">
@@ -504,7 +523,7 @@ function EstimateCalculator() {
               <strong>{search.trim() ? "Найденные позиции" : activeCategory === "popular" ? "Популярные работы" : "Позиции категории"}</strong>
               <span>{visibleServices.length} поз.</span>
             </div>
-            {visibleServices.map((service) => (
+            {visibleServiceSlice.map((service) => (
               <ServiceOption
                 key={service.id}
                 service={service}
@@ -513,6 +532,15 @@ function EstimateCalculator() {
                 onAdd={addService}
               />
             ))}
+            {visibleCount < visibleServices.length ? (
+              <button
+                className="estimate-more-button"
+                type="button"
+                onClick={() => setVisibleCount((current) => current + 18)}
+              >
+                Показать ещё {Math.min(18, visibleServices.length - visibleCount)} поз.
+              </button>
+            ) : null}
           </div>
         </div>
 

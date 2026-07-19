@@ -1,7 +1,13 @@
-import { Camera, PhoneCall, Sparkles } from "lucide-react";
-import { priceGroups } from "../../data/prices";
+import { Calculator, Camera, MessageCircle, PhoneCall, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import { landingPriceLegacyNumbers } from "../../data/prices";
 import { phoneHref } from "../../data/site";
-import EstimateCalculator from "../EstimateCalculator/EstimateCalculator";
+import { getServiceByLegacyNumber } from "../../shared/estimate/catalog";
+import { formatPrice, unitPriceLabels } from "../../shared/estimate/format";
+
+const landingPrices = landingPriceLegacyNumbers
+  .map((legacyNumber) => getServiceByLegacyNumber(legacyNumber))
+  .filter((service): service is NonNullable<typeof service> => Boolean(service));
 
 function Prices() {
   return (
@@ -30,29 +36,40 @@ function Prices() {
             Оценить по фото
           </a>
         </div>
-        <EstimateCalculator />
-        <div className="section-heading section-heading--wide price-heading-secondary">
-          <p className="eyebrow">Ориентиры</p>
-          <h3>Частые позиции из прайса</h3>
-          <p>
-            Ниже короткий список для быстрого понимания. Полный каталог, расчет по метражу и
-            предупреждения по составу работ доступны в калькуляторе выше.
-          </p>
-        </div>
-        <div className="price-grid">
-          {priceGroups.map((group) => (
-            <article className="price-card" key={group.title}>
-              <h3>{group.title}</h3>
-              <ul>
-                {group.items.map((item) => (
-                  <li key={item.name}>
-                    <span>{item.name}</span>
-                    <strong>{item.price}</strong>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
+        <div className="price-landing">
+          <div className="price-strip" aria-label="Популярные расценки">
+            {landingPrices.map((service) => (
+              <article className="price-strip-card" key={service.id}>
+                <span>№{service.legacyNumber}</span>
+                <h3>{service.name}</h3>
+                <strong>
+                  {formatPrice(service.price)} {unitPriceLabels[service.unit]}
+                </strong>
+              </article>
+            ))}
+          </div>
+          <aside className="price-cta-panel">
+            <Calculator size={28} />
+            <h3>Нужна смета по нескольким работам?</h3>
+            <p>
+              Откройте отдельный калькулятор: там поиск по каталогу, метраж, мастер новой
+              электроточки и передача расчёта в чат.
+            </p>
+            <div className="price-cta-panel__actions">
+              <Link className="button button--primary" to="/calculator">
+                <Calculator size={18} />
+                Рассчитать смету
+              </Link>
+              <button
+                className="button button--ghost"
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("chat:open"))}
+              >
+                <MessageCircle size={18} />
+                Задать вопрос
+              </button>
+            </div>
+          </aside>
         </div>
       </div>
     </section>

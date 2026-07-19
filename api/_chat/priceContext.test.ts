@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createEstimateInput } from "../../src/shared/estimate/calculate.js";
 import { estimateCatalogVersion } from "../../src/shared/estimate/catalog.js";
+import { buildModelMessages } from "./prompt.js";
 import { buildPricingContext } from "./priceContext.js";
 
 describe("chat price context", () => {
@@ -34,5 +35,14 @@ describe("chat price context", () => {
     const context = buildPricingContext("Сколько стоит подключить бассейн?");
 
     expect(context?.localFallbackReply).toContain("нет однозначной позиции");
+  });
+
+  it("keeps GigaChat-compatible message order with pricing context", () => {
+    const context = buildPricingContext("Сколько стоит установка бра?");
+    const messages = buildModelMessages("Сколько стоит установка бра?", [], context?.prompt);
+
+    expect(messages[0].role).toBe("system");
+    expect(messages.filter((message) => message.role === "system")).toHaveLength(1);
+    expect(messages.at(-1)?.role).toBe("user");
   });
 });

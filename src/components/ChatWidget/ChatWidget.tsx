@@ -18,11 +18,17 @@ function ChatWidget() {
   } = useChat();
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
     if (isOpen) {
       window.setTimeout(() => inputRef.current?.focus(), 120);
+    } else if (wasOpenRef.current) {
+      window.setTimeout(() => launcherRef.current?.focus(), 80);
     }
+
+    wasOpenRef.current = isOpen;
   }, [isOpen]);
 
   useEffect(() => {
@@ -62,6 +68,7 @@ function ChatWidget() {
   return (
     <aside className={`chat-widget ${isOpen ? "chat-widget--open" : ""}`} aria-live="polite">
       <button
+        ref={launcherRef}
         className="chat-launcher"
         type="button"
         aria-expanded={isOpen}

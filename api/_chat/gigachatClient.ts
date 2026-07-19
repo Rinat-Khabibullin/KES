@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
 import https from "node:https";
 import { chatModelConfig } from "./prompt.js";
+import { getChatRuntimeConfig, type ChatLogger } from "./runtime.js";
 import type { ModelMessage } from "./types.js";
 
 type OAuthResponse = {
@@ -28,39 +28,38 @@ type RequestOptions = {
   body: string;
   timeoutMs: number;
   verifySsl: boolean;
-  caCertPath?: string;
+  caCert?: Buffer;
+  stage: "oauth" | "completion";
+  log?: ChatLogger;
 };
 
 let tokenCache: TokenCache | null = null;
 
-function getEnv(name: string): string | undefined;
-function getEnv(name: string, fallback: string): string;
-function getEnv(name: string, fallback?: string) {
-  const value = process.env[name]?.trim();
-  return value || fallback;
+export class GigaChatHttpError extends Error {
+  constructor(
+    readonly statusCode: number,
+    readonly stage: string,
+    readonly responseSnippet: string,
+  ) {
+    super(`GigaChat HTTP ${statusCode} during ${stage}`);
+    this.name = "GigaChatHttpError";
+  }
 }
 
-const parseBooleanEnv = (name: string, fallback: boolean) => {
-  const value = getEnv(name);
-  if (!value) {
-    return fallback;
+export class GigaChatTimeoutError extends Error {
+  constructor(readonly stage: string) {
+    super(`GigaChat ${stage} request timeout`);
+    this.name = "GigaChatTimeoutError";
   }
-
-  return value.toLowerCase() === "true";
-};
-
-const parseTimeout = () => {
-  const timeout = Number(getEnv("GIGACHAT_TIMEOUT", "30"));
-  return Number.isFinite(timeout) && timeout > 0 ? timeout * 1000 : 30_000;
-};
+}
 
 const requestJson = <T>(url: string, options: RequestOptions): Promise<T> =>
   new Promise((resolve, reject) => {
     const target = new URL(url);
+    const startedAt = Date.now();
     const timeout = setTimeout(() => {
-      request.destroy(new Error("GigaChat request timeout"));
+      request.destroy(new GigaChatTimeoutError(options.stage));
     }, options.timeoutMs);
-    const ca = options.caCertPath ? readFileSync(options.caCertPath) : undefined;
     const request = https.request(
       {
         method: options.method,
@@ -73,7 +72,7 @@ const requestJson = <T>(url: string, options: RequestOptions): Promise<T> =>
           "Content-Length": Buffer.byteLength(options.body).toString(),
         },
         rejectUnauthorized: options.verifySsl,
-        ca,
+        ca: options.caCert,
       },
       (response) => {
         const chunks: Buffer[] = [];
@@ -82,16 +81,27 @@ const requestJson = <T>(url: string, options: RequestOptions): Promise<T> =>
         response.on("end", () => {
           clearTimeout(timeout);
           const text = Buffer.concat(chunks).toString("utf8");
+          options.log?.({
+            stage: options.stage,
+            status: response.statusCode,
+            durationMs: Date.now() - startedAt,
+          });
 
           if (!response.statusCode || response.statusCode < 200 || response.statusCode >= 300) {
-            reject(new Error(`GigaChat HTTP ${response.statusCode ?? 0}: ${text.slice(0, 240)}`));
+            reject(new GigaChatHttpError(response.statusCode ?? 0, options.stage, text.slice(0, 240)));
             return;
           }
 
           try {
             resolve(JSON.parse(text) as T);
           } catch {
-            reject(new Error("GigaChat returned invalid JSON"));
+            options.log?.({
+              stage: "response_parsing",
+              status: response.statusCode,
+              code: "invalid_json",
+              durationMs: Date.now() - startedAt,
+            });
+            reject(new Error(`GigaChat returned invalid JSON during ${options.stage}`));
           }
         });
       },
@@ -106,33 +116,27 @@ const requestJson = <T>(url: string, options: RequestOptions): Promise<T> =>
     request.end();
   });
 
-const getAccessToken = async () => {
+const getAccessToken = async (log?: ChatLogger) => {
   const now = Date.now();
   if (tokenCache && tokenCache.expiresAt - 60_000 > now) {
     return tokenCache.accessToken;
   }
 
-  const credentials = getEnv("GIGACHAT_CREDENTIALS");
-  if (!credentials) {
-    throw new Error("GIGACHAT_CREDENTIALS is not configured");
-  }
-
-  const timeoutMs = parseTimeout();
-  const verifySsl = parseBooleanEnv("GIGACHAT_VERIFY_SSL", true);
-  const authUrl = getEnv("GIGACHAT_AUTH_URL", "https://ngw.devices.sberbank.ru:9443/api/v2/oauth");
-  const scope = getEnv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS");
-  const response = await requestJson<OAuthResponse>(authUrl, {
+  const config = getChatRuntimeConfig();
+  const response = await requestJson<OAuthResponse>(config.authUrl, {
     method: "POST",
-    timeoutMs,
-    verifySsl,
-    caCertPath: getEnv("GIGACHAT_CA_CERT_PATH"),
+    timeoutMs: config.timeoutMs,
+    verifySsl: config.verifySsl,
+    caCert: config.caCert,
+    stage: "oauth",
+    log,
     headers: {
-      Authorization: `Basic ${credentials}`,
+      Authorization: `Basic ${config.credentials}`,
       "Content-Type": "application/x-www-form-urlencoded",
       Accept: "application/json",
       RqUID: randomUUID(),
     },
-    body: new URLSearchParams({ scope }).toString(),
+    body: new URLSearchParams({ scope: config.scope }).toString(),
   });
 
   if (!response.access_token) {
@@ -147,25 +151,24 @@ const getAccessToken = async () => {
   return tokenCache.accessToken;
 };
 
-export const askGigaChat = async (messages: ModelMessage[]) => {
-  const accessToken = await getAccessToken();
-  const timeoutMs = parseTimeout();
-  const verifySsl = parseBooleanEnv("GIGACHAT_VERIFY_SSL", true);
-  const apiUrl = getEnv("GIGACHAT_API_URL", "https://api.giga.chat/v1/chat/completions");
-  const model = getEnv("GIGACHAT_MODEL", "GigaChat-2");
+export const askGigaChat = async (messages: ModelMessage[], log?: ChatLogger) => {
+  const accessToken = await getAccessToken(log);
+  const config = getChatRuntimeConfig();
 
-  const response = await requestJson<GigaChatResponse>(apiUrl, {
+  const response = await requestJson<GigaChatResponse>(config.apiUrl, {
     method: "POST",
-    timeoutMs,
-    verifySsl,
-    caCertPath: getEnv("GIGACHAT_CA_CERT_PATH"),
+    timeoutMs: config.timeoutMs,
+    verifySsl: config.verifySsl,
+    caCert: config.caCert,
+    stage: "completion",
+    log,
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },
     body: JSON.stringify({
-      model,
+      model: config.model,
       messages,
       temperature: chatModelConfig.temperature,
       max_tokens: chatModelConfig.maxTokens,

@@ -21,21 +21,26 @@ export type ChatRequestBody = {
 export type ChatResponseBody = {
   reply: string;
   source: "gigachat" | "local";
+  requestId?: string;
 };
 
 export type ApiErrorBody = {
   error: string;
   code:
     | "bad_request"
+    | "config_error"
+    | "cors_forbidden"
     | "method_not_allowed"
     | "message_too_long"
     | "rate_limited"
     | "service_unavailable"
     | "invalid_credentials"
     | "upstream_timeout"
+    | "upstream_rate_limited"
     | "tls_error"
     | "internal_error"
     | "upstream_error";
+  requestId?: string;
 };
 
 export type ModelMessage = {
