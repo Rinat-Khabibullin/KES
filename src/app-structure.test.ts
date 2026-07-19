@@ -29,8 +29,9 @@ describe("app structure", () => {
     const scrollSource = readSource("./components/ScrollToHash/ScrollToHash.tsx");
 
     expect(appSource).toContain("<ScrollToHash />");
-    expect(scrollSource).toContain("scrollIntoView");
     expect(scrollSource).toContain("window.scrollTo");
+    expect(scrollSource).toContain("getTargetTop");
+    expect(scrollSource).toContain('document.querySelector<HTMLElement>(".site-header")');
     expect(scrollSource).toContain('document.getElementById("main-content")');
     expect(scrollSource).toContain("prefers-reduced-motion");
     expect(scrollSource).toContain('tabindex", "-1"');
@@ -44,6 +45,23 @@ describe("app structure", () => {
     expect(noteIndex).toBeGreaterThan(-1);
     expect(calculatorIndex).toBeGreaterThan(-1);
     expect(noteIndex).toBeLessThan(calculatorIndex);
+  });
+
+  it("keeps photo estimate instructions in a mobile-friendly semantic order", () => {
+    const photoEstimateSource = readSource("./components/PhotoEstimate/PhotoEstimate.tsx");
+    const chipsIndex = photoEstimateSource.indexOf('className="photo-estimate__chips"');
+    const stepsIndex = photoEstimateSource.indexOf('className="photo-estimate__steps"');
+    const avitoCtaIndex = photoEstimateSource.indexOf('href={avitoUrl}');
+    const phonePanelIndex = photoEstimateSource.indexOf('className="photo-estimate__panel"');
+
+    expect(photoEstimateSource).toContain('id="photo-estimate"');
+    expect(photoEstimateSource).toContain('aria-labelledby="photo-estimate-title"');
+    expect(photoEstimateSource).toContain("<ol");
+    expect(phonePanelIndex).toBeGreaterThan(avitoCtaIndex);
+    expect(chipsIndex).toBeLessThan(stepsIndex);
+    expect(stepsIndex).toBeLessThan(avitoCtaIndex);
+    expect(photoEstimateSource).toContain('className="button button--primary" href={avitoUrl}');
+    expect(photoEstimateSource).toContain('className="photo-estimate__panel" aria-hidden="true"');
   });
 
   it("routes quick chat actions through the local responder before API sending", () => {

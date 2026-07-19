@@ -41,6 +41,39 @@ const scrollToTopInstantly = () => {
   });
 };
 
+const getTargetTop = (target: HTMLElement) => {
+  const header = document.querySelector<HTMLElement>(".site-header");
+  const headerHeight = header?.getBoundingClientRect().height ?? 0;
+
+  return Math.max(0, target.getBoundingClientRect().top + window.scrollY - headerHeight - 18);
+};
+
+const scrollToTargetInstantly = (target: HTMLElement) => {
+  const root = document.documentElement;
+  const body = document.body;
+  const previousRootScrollBehavior = root.style.scrollBehavior;
+  const previousBodyScrollBehavior = body.style.scrollBehavior;
+  const targetTop = getTargetTop(target);
+
+  root.style.scrollBehavior = "auto";
+  body.style.scrollBehavior = "auto";
+  window.scrollTo(0, targetTop);
+
+  window.requestAnimationFrame(() => {
+    window.scrollTo(0, targetTop);
+    root.style.scrollBehavior = previousRootScrollBehavior;
+    body.style.scrollBehavior = previousBodyScrollBehavior;
+  });
+};
+
+const scrollToTargetSmoothly = (target: HTMLElement) => {
+  window.scrollTo({
+    top: getTargetTop(target),
+    left: 0,
+    behavior: "smooth",
+  });
+};
+
 function ScrollToHash() {
   const location = useLocation();
   const previousPathnameRef = useRef(location.pathname);
@@ -67,6 +100,7 @@ function ScrollToHash() {
     }
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isCompactViewport = window.matchMedia("(max-width: 900px)").matches;
 
     const id = decodeURIComponent(location.hash.slice(1));
     const target = document.getElementById(id);
@@ -76,10 +110,12 @@ function ScrollToHash() {
     }
 
     window.requestAnimationFrame(() => {
-      target.scrollIntoView({
-        block: "start",
-        behavior: prefersReducedMotion ? "auto" : "smooth",
-      });
+      if (prefersReducedMotion || isCompactViewport) {
+        scrollToTargetInstantly(target);
+      } else {
+        scrollToTargetSmoothly(target);
+      }
+
       focusTarget(target);
     });
   }, [location.hash, location.pathname]);
