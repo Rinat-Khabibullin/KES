@@ -3438,21 +3438,7 @@ details p {
   }
 
   .hero-showcase {
-    grid-template-columns: 1fr;
-    transform: none;
-  }
-
-  .hero-showcase__main,
-  .hero-showcase__main img {
-    min-height: 360px;
-  }
-
-  .hero-showcase__photos {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-showcase__photos img {
-    height: 220px;
+    display: none;
   }
 
   .benefit-grid,
@@ -3744,11 +3730,6 @@ details p {
 
   .photo-estimate h2 {
     font-size: 1.78rem;
-  }
-
-  .hero-showcase__main,
-  .hero-showcase__main img {
-    min-height: 310px;
   }
 
   .portfolio-card__button {
