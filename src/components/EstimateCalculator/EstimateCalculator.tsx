@@ -33,6 +33,7 @@ import type {
   EstimateService,
   EstimateUnit,
 } from "../../shared/estimate/types";
+import { reachGoal } from "../../utils/metrika";
 
 type PointMaterial = "drywall" | "brick" | "concrete" | "gasblock" | "monolith" | "reinforced";
 type PointMechanism = "socket-single" | "socket-double" | "switch-single" | "switch-double" | "power-socket" | "none";
@@ -218,12 +219,19 @@ function EstimateCalculator() {
     setQuantityInputs((current) => ({ ...current, [serviceId]: value }));
   };
 
+  const trackFirstEstimateItem = (currentItems: EstimateLineInput[], nextItems: EstimateLineInput[]) => {
+    if (currentItems.length === 0 && nextItems.length > 0) {
+      reachGoal("estimate_first_item");
+    }
+  };
+
   const addService = (service: EstimateService, quantityOverride?: number) => {
     const quantity = quantityOverride ?? parseQuantity(quantityInputs[service.id] ?? getDefaultQuantity(service));
 
     try {
       const nextItems = mergeItems(items, [{ serviceId: service.id, quantity }]);
       calculateEstimate({ items: nextItems, conditions });
+      trackFirstEstimateItem(items, nextItems);
       setItems(nextItems);
       setError("");
     } catch (calculationError) {
@@ -304,6 +312,7 @@ function EstimateCalculator() {
 
     try {
       calculateEstimate({ items: nextItems, conditions: nextConditions });
+      trackFirstEstimateItem(items, nextItems);
       setItems(nextItems);
       setConditions(nextConditions);
       setError(
@@ -321,6 +330,18 @@ function EstimateCalculator() {
       setError("Добавьте хотя бы одну работу в смету.");
       return;
     }
+
+    const orderPrice = typeof result.totalMin === "number" && Number.isFinite(result.totalMin)
+      ? result.totalMin
+      : result.calculableSubtotal > 0
+        ? result.calculableSubtotal
+        : undefined;
+
+    reachGoal("estimate_discuss", {
+      ...(orderPrice === undefined ? {} : { order_price: orderPrice }),
+      currency: "RUB",
+      items_count: result.lines.length,
+    });
 
     window.dispatchEvent(
       new CustomEvent("estimate-chat:send", {

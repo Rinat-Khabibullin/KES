@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { avitoUrl, brandCaption, brandName, phoneHref } from "../../data/site";
 import ThemeToggle from "../../features/theme-toggle/ThemeToggle";
 import { loadCalculatorPage } from "../../routes/lazyRoutes";
+import { trackAvitoClick } from "../../utils/metrika";
 import BrandMark from "../BrandMark/BrandMark";
 
 type NavItem = { hash: string; label: string; to?: never } | { to: string; label: string; hash?: never };
@@ -134,7 +135,7 @@ function Header() {
           ))}
           <Link to={location.pathname === "/" ? "#photo-estimate" : "/#photo-estimate"}>Оценка по фото</Link>
           <Link to={location.pathname === "/" ? "#partners" : "/#partners"}>Партнёрам</Link>
-          <a href={avitoUrl} target="_blank" rel="noopener noreferrer">
+          <a href={avitoUrl} target="_blank" rel="noopener noreferrer" onClick={trackAvitoClick}>
             Авито
           </a>
         </nav>

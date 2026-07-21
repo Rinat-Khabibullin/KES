@@ -55,11 +55,16 @@ GIGACHAT_AUTH_URL=https://ngw.devices.sberbank.ru:9443/api/v2/oauth
 GIGACHAT_API_URL=https://api.giga.chat/v1/chat/completions
 GIGACHAT_CA_CERT_BASE64=
 LLM_CORS_ORIGINS=https://electrik-tuapse.ru,https://www.electrik-tuapse.ru
+VITE_YM_ID=110920709
 ```
 
 Для локальной диагностики допускается `GIGACHAT_VERIFY_SSL=false`. В Production лучше использовать `true` и передать сертификат через `GIGACHAT_CA_CERT_BASE64` или `GIGACHAT_CA_CERT_PATH`.
 
 После изменения переменных на Vercel нужен новый deployment.
+
+## Аналитика
+
+Yandex Metrika подключается один раз в `index.html`. ID счётчика берётся из `VITE_YM_ID`, а программные цели отправляются через `src/utils/metrika.ts`.
 
 ## Диагностика чата
 

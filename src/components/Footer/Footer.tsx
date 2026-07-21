@@ -1,4 +1,5 @@
 import { avitoUrl, brandCaption, brandName, phoneDisplay, phoneHref } from "../../data/site";
+import { trackAvitoClick } from "../../utils/metrika";
 import BrandMark from "../BrandMark/BrandMark";
 
 function Footer() {
@@ -19,7 +20,7 @@ function Footer() {
         </div>
         <address>
           <a href={phoneHref}>{phoneDisplay}</a>
-          <a href={avitoUrl} target="_blank" rel="noopener noreferrer">
+          <a href={avitoUrl} target="_blank" rel="noopener noreferrer" onClick={trackAvitoClick}>
             Авито
           </a>
         </address>

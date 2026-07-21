@@ -7,6 +7,7 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 import MobileActions from "./components/MobileActions/MobileActions";
 import ScrollToHash from "./components/ScrollToHash/ScrollToHash";
 import ChatMount from "./components/ChatMount/ChatMount";
+import MetrikaTracker from "./components/MetrikaTracker/MetrikaTracker";
 import ThemeToggle from "./features/theme-toggle/ThemeToggle";
 import { CalculatorPage, NotFoundPage, PortfolioModal } from "./routes/lazyRoutes";
 
@@ -138,6 +139,7 @@ function App() {
       </a>
       <Header />
       <ScrollToHash />
+      <MetrikaTracker />
       <Suspense fallback={<div className="route-skeleton" aria-busy="true" aria-label="Загрузка страницы" />}>
         <Routes>
           <Route path="/" element={<LandingPage onOpenWork={setActiveWork} />} />

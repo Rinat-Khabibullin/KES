@@ -6,6 +6,7 @@ import { chatInputLimit, chatQuickActions } from "../../data/chat";
 import { phoneHref } from "../../data/site";
 import ThemeToggle from "../../features/theme-toggle/ThemeToggle";
 import { useChat } from "../../hooks/useChat";
+import { trackAvitoClick } from "../../utils/metrika";
 
 function ChatWidget() {
   const {
@@ -69,6 +70,12 @@ function ChatWidget() {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       void send();
+    }
+  };
+
+  const handleExternalActionClick = (href: string) => {
+    if (href.includes("avito.ru")) {
+      trackAvitoClick();
     }
   };
 
@@ -139,17 +146,23 @@ function ChatWidget() {
               <p>{message.content}</p>
               {message.actions?.length ? (
                 <div className="chat-message__actions">
-                  {message.actions.map((action) =>
-                    action.href?.startsWith("/") ? (
-                      <Link key={action.id} to={action.href}>
+                  {message.actions.map((action) => {
+                    const href = action.href;
+
+                    if (!href) {
+                      return null;
+                    }
+
+                    return href.startsWith("/") ? (
+                      <Link key={action.id} to={href}>
                         {action.label}
                       </Link>
-                    ) : action.href ? (
-                      <a key={action.id} href={action.href}>
+                    ) : (
+                      <a key={action.id} href={href} onClick={() => handleExternalActionClick(href)}>
                         {action.label}
                       </a>
-                    ) : null,
-                  )}
+                    );
+                  })}
                 </div>
               ) : null}
             </article>

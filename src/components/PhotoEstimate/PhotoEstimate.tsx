@@ -1,6 +1,7 @@
 import { ArrowUpRight, Camera, CheckCircle2, PhoneCall } from "lucide-react";
 import { photoEstimateExamples, photoEstimateSteps } from "../../data/estimate";
 import { avitoUrl, phoneHref } from "../../data/site";
+import { trackAvitoClick } from "../../utils/metrika";
 
 function PhotoEstimate() {
   return (
@@ -31,7 +32,7 @@ function PhotoEstimate() {
           </ol>
 
           <div className="photo-estimate__actions">
-            <a className="button button--primary" href={avitoUrl} target="_blank" rel="noopener noreferrer">
+            <a className="button button--primary" href={avitoUrl} target="_blank" rel="noopener noreferrer" onClick={trackAvitoClick}>
               <ArrowUpRight size={19} />
               Отправить фото через Авито
             </a>

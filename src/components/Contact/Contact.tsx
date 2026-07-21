@@ -1,5 +1,6 @@
 import { ArrowUpRight, Camera, PhoneCall, Sparkles } from "lucide-react";
 import { avitoUrl, phoneDisplay, phoneHref } from "../../data/site";
+import { trackAvitoClick } from "../../utils/metrika";
 
 function Contact() {
   return (
@@ -23,7 +24,13 @@ function Contact() {
             <PhoneCall size={19} />
             Позвонить: {phoneDisplay}
           </a>
-          <a className="button button--ghost" href={avitoUrl} target="_blank" rel="noopener noreferrer">
+          <a
+            className="button button--ghost"
+            href={avitoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={trackAvitoClick}
+          >
             <ArrowUpRight size={19} />
             Открыть Авито
           </a>

@@ -3,6 +3,7 @@ import { resolveChatQuickAction, resolveLocalCatalogQuestion } from "../chat/loc
 import { chatGreeting, chatInputLimit, type ChatQuickAction } from "../data/chat";
 import { ChatClientError, sendChatMessage } from "../api/chatClient";
 import type { ChatApiMessage, ChatEstimateContext, ChatMessage, ChatMessageAction } from "../types/chat";
+import { reachGoal } from "../utils/metrika";
 
 const storageKey = "elektrika-tuapse-chat-history";
 const requestTimeoutMs = 35_000;
@@ -63,12 +64,18 @@ export const useChat = () => {
     estimateContext?: ChatEstimateContext;
   } | null>(null);
   const sendingRef = useRef(false);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(messages.slice(-30)));
   }, [messages]);
 
   useEffect(() => {
+    if (isOpen && !wasOpenRef.current) {
+      reachGoal("chat_open");
+    }
+
+    wasOpenRef.current = isOpen;
     document.body.classList.toggle("is-chat-open", isOpen);
     return () => document.body.classList.remove("is-chat-open");
   }, [isOpen]);
@@ -141,6 +148,7 @@ export const useChat = () => {
           estimateContext,
           signal: controller.signal,
         });
+        reachGoal("chat_message_sent");
         setMessages((current) => [...current, createMessage("assistant", response.reply, response.source)]);
         setLastFailedRequest(null);
       } catch (error) {
