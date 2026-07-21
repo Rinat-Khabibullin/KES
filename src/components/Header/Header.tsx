@@ -2,6 +2,7 @@ import { Menu, PhoneCall, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { avitoUrl, brandCaption, brandName, phoneHref } from "../../data/site";
+import ThemeToggle from "../../features/theme-toggle/ThemeToggle";
 import { loadCalculatorPage } from "../../routes/lazyRoutes";
 import BrandMark from "../BrandMark/BrandMark";
 
@@ -118,6 +119,7 @@ function Header() {
       </div>
 
       <div className={`mobile-menu ${isMenuOpen ? "mobile-menu--open" : ""}`} id="mobile-menu" ref={panelRef}>
+        <ThemeToggle variant="menu" />
         <nav aria-label="Мобильная навигация">
           {navItems.map((item) => (
             <Link

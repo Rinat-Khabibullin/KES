@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { chatInputLimit, chatQuickActions } from "../../data/chat";
 import { phoneHref } from "../../data/site";
+import ThemeToggle from "../../features/theme-toggle/ThemeToggle";
 import { useChat } from "../../hooks/useChat";
 
 function ChatWidget() {
@@ -110,6 +111,7 @@ function ChatWidget() {
             </div>
           </div>
           <div className="chat-panel__tools">
+            <ThemeToggle variant="chat" />
             <button
               type="button"
               onClick={() => setQuickActionsVisible((current) => !current)}

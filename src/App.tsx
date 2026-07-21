@@ -7,6 +7,7 @@ import LandingPage from "./pages/LandingPage/LandingPage";
 import MobileActions from "./components/MobileActions/MobileActions";
 import ScrollToHash from "./components/ScrollToHash/ScrollToHash";
 import ChatMount from "./components/ChatMount/ChatMount";
+import ThemeToggle from "./features/theme-toggle/ThemeToggle";
 import { CalculatorPage, NotFoundPage, PortfolioModal } from "./routes/lazyRoutes";
 
 const pageMeta = {
@@ -151,6 +152,7 @@ function App() {
         </Suspense>
       ) : null}
       <ChatMount />
+      <ThemeToggle />
       <MobileActions />
     </>
   );

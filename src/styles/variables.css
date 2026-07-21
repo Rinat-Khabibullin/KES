@@ -1,40 +1,142 @@
-:root {
-  --color-bg: #0b0f14;
-  --color-surface: #121923;
-  --color-surface-elevated: #1a2330;
-  --color-surface-soft: #202c3a;
-  --color-text: #ffffff;
-  --color-text-muted: #b9c4cf;
-  --color-text-soft: #dce7f2;
-  --color-border: rgba(255, 255, 255, 0.12);
-  --color-border-strong: rgba(255, 255, 255, 0.22);
-  --color-primary: #129bff;
-  --color-primary-hover: #43b4ff;
-  --color-accent: #ffb020;
-  --color-success: #31d158;
-  --color-warning: #ffb020;
-  --color-error: #ff6b35;
-  --color-focus: rgba(18, 155, 255, 0.58);
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #f4f7fb;
+  --color-bg-mid: #eef4fb;
+  --color-bg-deep: #e8eef6;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f8fbff;
+  --color-surface-soft: #edf4fb;
+  --color-surface-warm: #fff7e7;
+  --color-text: #0f1724;
+  --color-text-muted: #5f6f82;
+  --color-text-soft: #243244;
+  --color-border: rgba(17, 31, 48, 0.13);
+  --color-border-strong: rgba(17, 31, 48, 0.22);
+  --color-primary: #0879d4;
+  --color-primary-hover: #0a90f5;
+  --color-primary-strong: #075eb2;
+  --color-accent: #d68300;
+  --color-accent-hover: #b96a00;
+  --color-accent-text: #8a4f00;
+  --color-success: #168044;
+  --color-success-text: #126238;
+  --color-warning: #d68300;
+  --color-danger: #c73a22;
+  --color-danger-text: #922514;
+  --color-error: var(--color-danger);
+  --color-error-text: var(--color-danger-text);
+  --color-focus: rgba(8, 121, 212, 0.42);
+  --color-overlay: rgba(7, 12, 20, 0.48);
+  --color-overlay-strong: rgba(7, 12, 20, 0.62);
+
+  --color-bg-rgb: 244, 247, 251;
+  --color-bg-mid-rgb: 238, 244, 251;
+  --color-bg-deep-rgb: 232, 238, 246;
+  --color-surface-rgb: 255, 255, 255;
+  --color-surface-elevated-rgb: 248, 251, 255;
+  --color-surface-soft-rgb: 237, 244, 251;
+  --color-text-rgb: 15, 23, 36;
+  --color-text-soft-rgb: 36, 50, 68;
+  --color-contrast-rgb: 17, 31, 48;
+  --color-primary-rgb: 8, 121, 212;
+  --color-accent-rgb: 214, 131, 0;
+  --color-success-rgb: 22, 128, 68;
+  --color-error-rgb: 199, 58, 34;
+  --color-violet-rgb: 94, 70, 255;
+  --color-shadow-rgb: 24, 36, 56;
+
+  --page-background:
+    linear-gradient(115deg, rgba(var(--color-primary-rgb), 0.09) 0 1px, transparent 1px 22%),
+    linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-mid) 40%, var(--color-bg-deep) 100%);
+  --page-grid-line: rgba(var(--color-contrast-rgb), 0.045);
+  --page-grid-line-soft: rgba(var(--color-contrast-rgb), 0.032);
+  --page-cable-blue: rgba(var(--color-primary-rgb), 0.11);
+  --page-cable-amber: rgba(var(--color-accent-rgb), 0.12);
+  --section-contrast-bg:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1), transparent 26%),
+    linear-gradient(225deg, rgba(var(--color-accent-rgb), 0.11), transparent 28%),
+    linear-gradient(180deg, rgba(var(--color-surface-rgb), 0.88), rgba(var(--color-bg-rgb), 0.96));
+  --section-blueprint-bg:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1), transparent 28%),
+    linear-gradient(245deg, rgba(var(--color-violet-rgb), 0.08), transparent 28%),
+    rgba(var(--color-surface-soft-rgb), 0.7);
+  --section-photo-bg:
+    linear-gradient(126deg, rgba(var(--color-success-rgb), 0.1), transparent 26%),
+    linear-gradient(225deg, rgba(var(--color-primary-rgb), 0.12), transparent 33%),
+    var(--color-bg-deep);
+  --section-partner-bg:
+    linear-gradient(120deg, rgba(var(--color-violet-rgb), 0.1), transparent 30%),
+    linear-gradient(240deg, rgba(var(--color-accent-rgb), 0.12), transparent 34%),
+    var(--color-bg-mid);
+  --card-background:
+    linear-gradient(145deg, rgba(var(--color-surface-rgb), 0.82), rgba(var(--color-surface-soft-rgb), 0.54)),
+    rgba(var(--color-surface-rgb), 0.92);
+  --panel-background:
+    linear-gradient(145deg, rgba(var(--color-surface-rgb), 0.9), rgba(var(--color-surface-soft-rgb), 0.64)),
+    rgba(var(--color-surface-rgb), 0.94);
+  --header-background:
+    linear-gradient(90deg, rgba(var(--color-surface-rgb), 0.88), rgba(var(--color-surface-soft-rgb), 0.72)),
+    rgba(var(--color-surface-rgb), 0.86);
+  --mobile-menu-background:
+    linear-gradient(145deg, rgba(var(--color-surface-rgb), 0.98), rgba(var(--color-surface-soft-rgb), 0.97)),
+    var(--color-surface);
+  --input-background: rgba(var(--color-surface-rgb), 0.82);
+  --input-background-focus: rgba(var(--color-surface-rgb), 0.96);
+  --chip-background: rgba(var(--color-primary-rgb), 0.08);
+  --quiet-background: rgba(var(--color-contrast-rgb), 0.045);
+  --accent-soft-background: rgba(var(--color-accent-rgb), 0.1);
+  --success-soft-background: rgba(var(--color-success-rgb), 0.1);
+  --danger-soft-background: rgba(var(--color-error-rgb), 0.1);
+  --eyebrow-background: rgba(var(--color-accent-rgb), 0.1);
+  --eyebrow-border: rgba(var(--color-accent-rgb), 0.28);
+  --eyebrow-text: var(--color-accent-text);
+  --selection-background: rgba(var(--color-primary-rgb), 0.24);
+  --skeleton-background:
+    linear-gradient(90deg, transparent, rgba(var(--color-surface-rgb), 0.72), transparent),
+    rgba(var(--color-surface-soft-rgb), 0.74);
+  --footer-background: #e7edf5;
+  --modal-media-background: #101827;
+  --modal-backdrop: rgba(7, 12, 20, 0.62);
+  --chat-panel-background:
+    linear-gradient(145deg, rgba(var(--color-surface-rgb), 0.98), rgba(var(--color-surface-soft-rgb), 0.96)),
+    var(--color-surface);
+  --chat-form-background: rgba(var(--color-surface-soft-rgb), 0.92);
+  --chat-assistant-background:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.08), rgba(var(--color-surface-rgb), 0.86)),
+    rgba(var(--color-surface-rgb), 0.96);
+  --chat-user-background: linear-gradient(135deg, var(--color-primary), var(--color-primary-strong));
+  --chat-user-text: #ffffff;
+  --brand-bolt-stroke: rgba(255, 255, 255, 0.9);
+  --launcher-background:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.14), rgba(var(--color-accent-rgb), 0.12)),
+    rgba(var(--color-surface-rgb), 0.94);
+  --mobile-bar-background: rgba(var(--color-surface-rgb), 0.92);
+  --primary-gradient: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary-strong) 58%, #5e46ff);
+
   --background: var(--color-bg);
   --surface: var(--color-surface);
   --surface-light: var(--color-surface-elevated);
-  --surface-warm: #201a12;
+  --surface-warm: var(--color-surface-warm);
   --electric-blue: var(--color-primary);
-  --cyan: #34d5ff;
-  --violet: #8b5cf6;
-  --electric-blue-soft: rgba(18, 155, 255, 0.16);
+  --cyan: #0879d4;
+  --violet: #5e46ff;
+  --electric-blue-soft: rgba(var(--color-primary-rgb), 0.14);
   --amber: var(--color-accent);
   --orange: var(--color-error);
-  --amber-soft: rgba(255, 176, 32, 0.16);
+  --amber-soft: rgba(var(--color-accent-rgb), 0.14);
   --text-main: var(--color-text);
   --text-soft: var(--color-text-soft);
   --text-muted: var(--color-text-muted);
   --success: var(--color-success);
   --line: var(--color-border);
   --line-strong: var(--color-border-strong);
-  --shadow: 0 28px 90px rgba(0, 0, 0, 0.44);
-  --blue-glow: 0 0 42px rgba(18, 155, 255, 0.32);
-  --amber-glow: 0 0 38px rgba(255, 176, 32, 0.26);
+  --shadow-sm: 0 10px 28px rgba(var(--color-shadow-rgb), 0.12);
+  --shadow-md: 0 18px 54px rgba(var(--color-shadow-rgb), 0.16);
+  --shadow-lg: 0 28px 90px rgba(var(--color-shadow-rgb), 0.2);
+  --shadow: var(--shadow-lg);
+  --blue-glow: 0 14px 36px rgba(var(--color-primary-rgb), 0.2);
+  --amber-glow: 0 14px 34px rgba(var(--color-accent-rgb), 0.17);
   --radius: 8px;
   --radius-lg: 12px;
   --container: 1180px;
@@ -59,4 +161,128 @@
   --button-height-md: 48px;
   --button-height-lg: 56px;
   --button-radius: 10px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #0b0f14;
+  --color-bg-mid: #0d1218;
+  --color-bg-deep: #070a0f;
+  --color-surface: #121923;
+  --color-surface-elevated: #1a2330;
+  --color-surface-soft: #202c3a;
+  --color-surface-warm: #201a12;
+  --color-text: #ffffff;
+  --color-text-muted: #b9c4cf;
+  --color-text-soft: #dce7f2;
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.22);
+  --color-primary: #129bff;
+  --color-primary-hover: #43b4ff;
+  --color-primary-strong: #0f63dd;
+  --color-accent: #ffb020;
+  --color-accent-hover: #ffc24c;
+  --color-accent-text: #ffd28a;
+  --color-success: #31d158;
+  --color-success-text: #aeeec0;
+  --color-warning: #ffb020;
+  --color-danger: #ff6b35;
+  --color-danger-text: #ffd0c4;
+  --color-error: var(--color-danger);
+  --color-error-text: var(--color-danger-text);
+  --color-focus: rgba(18, 155, 255, 0.58);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-overlay-strong: rgba(0, 0, 0, 0.76);
+
+  --color-bg-rgb: 11, 15, 20;
+  --color-bg-mid-rgb: 13, 18, 24;
+  --color-bg-deep-rgb: 7, 10, 15;
+  --color-surface-rgb: 18, 25, 35;
+  --color-surface-elevated-rgb: 26, 35, 48;
+  --color-surface-soft-rgb: 32, 44, 58;
+  --color-text-rgb: 255, 255, 255;
+  --color-text-soft-rgb: 220, 231, 242;
+  --color-contrast-rgb: 255, 255, 255;
+  --color-primary-rgb: 18, 155, 255;
+  --color-accent-rgb: 255, 176, 32;
+  --color-success-rgb: 49, 209, 88;
+  --color-error-rgb: 255, 107, 53;
+  --color-violet-rgb: 139, 92, 246;
+  --color-shadow-rgb: 0, 0, 0;
+
+  --page-background:
+    linear-gradient(115deg, rgba(var(--color-primary-rgb), 0.12) 0 1px, transparent 1px 22%),
+    linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-mid) 34%, var(--color-bg-deep) 100%);
+  --page-grid-line: rgba(var(--color-contrast-rgb), 0.035);
+  --page-grid-line-soft: rgba(var(--color-contrast-rgb), 0.028);
+  --page-cable-blue: rgba(var(--color-primary-rgb), 0.1);
+  --page-cable-amber: rgba(var(--color-accent-rgb), 0.11);
+  --section-contrast-bg:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1), transparent 26%),
+    linear-gradient(225deg, rgba(var(--color-accent-rgb), 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(var(--color-surface-rgb), 0.88), rgba(var(--color-bg-rgb), 0.95));
+  --section-blueprint-bg:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.11), transparent 28%),
+    linear-gradient(245deg, rgba(var(--color-violet-rgb), 0.1), transparent 28%),
+    rgba(var(--color-bg-deep-rgb), 0.5);
+  --section-photo-bg:
+    linear-gradient(126deg, rgba(var(--color-success-rgb), 0.12), transparent 26%),
+    linear-gradient(225deg, rgba(var(--color-primary-rgb), 0.14), transparent 33%),
+    #091018;
+  --section-partner-bg:
+    linear-gradient(120deg, rgba(var(--color-violet-rgb), 0.12), transparent 30%),
+    linear-gradient(240deg, rgba(var(--color-accent-rgb), 0.12), transparent 34%),
+    #0a0e13;
+  --card-background:
+    linear-gradient(145deg, rgba(var(--color-contrast-rgb), 0.078), rgba(var(--color-contrast-rgb), 0.022)),
+    rgba(var(--color-surface-rgb), 0.82);
+  --panel-background:
+    linear-gradient(145deg, rgba(var(--color-contrast-rgb), 0.08), rgba(var(--color-contrast-rgb), 0.025)),
+    rgba(var(--color-surface-rgb), 0.86);
+  --header-background:
+    linear-gradient(90deg, rgba(var(--color-contrast-rgb), 0.09), rgba(var(--color-contrast-rgb), 0.035)),
+    rgba(var(--color-bg-deep-rgb), 0.78);
+  --mobile-menu-background:
+    linear-gradient(145deg, rgba(var(--color-surface-elevated-rgb), 0.97), rgba(8, 12, 18, 0.97)),
+    var(--color-bg);
+  --input-background: rgba(var(--color-bg-deep-rgb), 0.7);
+  --input-background-focus: rgba(var(--color-bg-deep-rgb), 0.9);
+  --chip-background: rgba(var(--color-primary-rgb), 0.08);
+  --quiet-background: rgba(var(--color-contrast-rgb), 0.055);
+  --accent-soft-background: rgba(var(--color-accent-rgb), 0.1);
+  --success-soft-background: rgba(var(--color-success-rgb), 0.1);
+  --danger-soft-background: rgba(var(--color-error-rgb), 0.1);
+  --eyebrow-background: rgba(var(--color-accent-rgb), 0.08);
+  --eyebrow-border: rgba(var(--color-accent-rgb), 0.24);
+  --eyebrow-text: var(--color-accent-text);
+  --selection-background: rgba(var(--color-primary-rgb), 0.34);
+  --skeleton-background:
+    linear-gradient(90deg, transparent, rgba(var(--color-contrast-rgb), 0.08), transparent),
+    rgba(var(--color-surface-rgb), 0.72);
+  --footer-background: var(--color-bg-deep);
+  --modal-media-background: #05070a;
+  --modal-backdrop: rgba(0, 0, 0, 0.76);
+  --chat-panel-background:
+    linear-gradient(145deg, rgba(31, 44, 61, 0.98), rgba(9, 13, 19, 0.98)),
+    #0c1118;
+  --chat-form-background: rgba(var(--color-bg-deep-rgb), 0.92);
+  --chat-assistant-background:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.16), rgba(var(--color-contrast-rgb), 0.055)),
+    rgba(21, 31, 43, 0.96);
+  --chat-user-background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.86), rgba(94, 70, 255, 0.78));
+  --chat-user-text: #ffffff;
+  --brand-bolt-stroke: rgba(255, 244, 212, 0.84);
+  --launcher-background:
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.24), rgba(var(--color-accent-rgb), 0.14)),
+    rgba(var(--color-surface-elevated-rgb), 0.92);
+  --mobile-bar-background: rgba(var(--color-bg-rgb), 0.9);
+  --primary-gradient: linear-gradient(135deg, #15a7ff, var(--color-primary-strong) 58%, #6745ff);
+
+  --cyan: #34d5ff;
+  --violet: #8b5cf6;
+  --shadow-sm: 0 10px 28px rgba(var(--color-shadow-rgb), 0.22);
+  --shadow-md: 0 18px 54px rgba(var(--color-shadow-rgb), 0.3);
+  --shadow-lg: 0 28px 90px rgba(var(--color-shadow-rgb), 0.44);
+  --blue-glow: 0 0 42px rgba(var(--color-primary-rgb), 0.32);
+  --amber-glow: 0 0 38px rgba(var(--color-accent-rgb), 0.26);
 }

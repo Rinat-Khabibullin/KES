@@ -16,7 +16,35 @@
     />
     <meta name="robots" content="index, follow" />
     <meta name="yandex-verification" content="9d6f2bda2de01d5d" />
-    <meta name="theme-color" content="#0B0F14" />
+    <meta name="theme-color" content="#f4f7fb" />
+    <script>
+      (() => {
+        const storageKey = "elektrika-tuapse-theme-preference";
+        const darkQuery = "(prefers-color-scheme: dark)";
+        let preference = "system";
+
+        try {
+          const stored = window.localStorage.getItem(storageKey);
+          if (stored === "light" || stored === "dark" || stored === "system") {
+            preference = stored;
+          }
+        } catch {
+          preference = "system";
+        }
+
+        const systemTheme = window.matchMedia?.(darkQuery).matches ? "dark" : "light";
+        const theme = preference === "system" ? systemTheme : preference;
+        const root = document.documentElement;
+        root.setAttribute("data-theme", theme);
+        root.setAttribute("data-theme-preference", preference);
+        root.style.colorScheme = theme;
+
+        document.querySelector('meta[name="theme-color"]')?.setAttribute(
+          "content",
+          theme === "dark" ? "#0b0f14" : "#f4f7fb",
+        );
+      })();
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
     <meta property="og:url" content="https://www.electrik-tuapse.ru/" />
